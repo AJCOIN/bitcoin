@@ -53,22 +53,27 @@ class AddressIndexTest(BitcoinTestFramework):
         print("Testing p2pkh and p2sh address index...")
 
         txid0 = self.nodes[0].sendtoaddress("mo9ncXisMeAoXwqcV5EWuyncbmCcQN4rVs", 10)
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(100)
+        self.sync_all()
 
         txidb0 = self.nodes[0].sendtoaddress("2N2JD6wb56AfK4tfmM6PwdVmoYk2dCKf4Br", 10)
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(100)
+        self.sync_all()
 
         txid1 = self.nodes[0].sendtoaddress("mo9ncXisMeAoXwqcV5EWuyncbmCcQN4rVs", 15)
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(100)
+        self.sync_all()
 
         txidb1 = self.nodes[0].sendtoaddress("2N2JD6wb56AfK4tfmM6PwdVmoYk2dCKf4Br", 15)
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(100)
+        self.sync_all()
 
         txid2 = self.nodes[0].sendtoaddress("mo9ncXisMeAoXwqcV5EWuyncbmCcQN4rVs", 20)
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(100)
+        self.sync_all()
 
         txidb2 = self.nodes[0].sendtoaddress("2N2JD6wb56AfK4tfmM6PwdVmoYk2dCKf4Br", 20)
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(100)
 
         self.sync_all()
 
