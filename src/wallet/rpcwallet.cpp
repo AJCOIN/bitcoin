@@ -8,7 +8,6 @@
 #include <consensus/validation.h>
 #include <core_io.h>
 #include <httpserver.h>
-#include <validation.h>
 #include <key_io.h>
 #include <net.h>
 #include <outputtype.h>
@@ -16,6 +15,7 @@
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <policy/rbf.h>
+#include <rpc/doc.h>
 #include <rpc/mining.h>
 #include <rpc/rawtransaction.h>
 #include <rpc/server.h>
@@ -25,6 +25,7 @@
 #include <timedata.h>
 #include <util.h>
 #include <utilmoneystr.h>
+#include <validation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/feebumper.h>
 #include <wallet/rpcwallet.h>
@@ -3868,34 +3869,30 @@ UniValue walletprocesspsbt(const JSONRPCRequest& request)
     }
 
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 4)
-        throw std::runtime_error(
-            "walletprocesspsbt \"psbt\" ( sign \"sighashtype\" bip32derivs )\n"
-            "\nUpdate a PSBT with input information from our wallet and then sign inputs\n"
-            "that we can sign for.\n"
-            + HelpRequiringPassphrase(pwallet) + "\n"
-
-            "\nArguments:\n"
-            "1. \"psbt\"                      (string, required) The transaction base64 string\n"
-            "2. sign                          (boolean, optional, default=true) Also sign the transaction when updating\n"
-            "3. \"sighashtype\"            (string, optional, default=ALL) The signature hash type to sign with if not specified by the PSBT. Must be one of\n"
-            "                                 - \"ALL\"\n"
-            "                                 - \"NONE\"\n"
-            "                                 - \"SINGLE\"\n"
-            "                                 - \"ALL|ANYONECANPAY\"\n"
-            "                                 - \"NONE|ANYONECANPAY\"\n"
-            "                                 - \"SINGLE|ANYONECANPAY\"\n"
-            "4. bip32derivs                    (boolean, optional, default=false) If true, includes the BIP 32 derivation paths for public keys if we know them\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"psbt\" : \"value\",          (string) The base64-encoded partially signed transaction\n"
-            "  \"complete\" : true|false,   (boolean) If the transaction has a complete set of signatures\n"
-            "  ]\n"
-            "}\n"
-
-            "\nExamples:\n"
-            + HelpExampleCli("walletprocesspsbt", "\"psbt\"")
-        );
+        throw RPCDoc("walletprocesspsbt", "\"psbt\" ( sign \"sighashtype\" bip32derivs )")
+            .Desc(
+                "Update a PSBT with input information from our wallet and then sign inputs\n"
+                "that we can sign for.")
+            .Table("Arguments")
+            .Row("1. \"psbt\"", {"string", "required"}, "The transaction base64 string")
+            .Row("2. sign", {"boolean", "optional", "default=true"}, "Also sign the transaction when updating")
+            .Row("3. \"sighashtype\"", {"string", "optional", "default=ALL"},
+                "The signature hash type to sign with if not specified by the PSBT. Must be one of\n"
+                "- \"ALL\"\n"
+                "- \"NONE\"\n"
+                "- \"SINGLE\"\n"
+                "- \"ALL|ANYONECANPAY\"\n"
+                "- \"NONE|ANYONECANPAY\"\n"
+                "- \"SINGLE|ANYONECANPAY\"")
+            .Row("4. bip32derivs", {"boolean", "optional", "default=false"}, "If true, includes the BIP 32 derivation paths for public keys if we know them")
+            .Table("Result")
+            .Row("{")
+            .Row("  \"psbt\" : \"value\",", {"string"}, "The base64-encoded partially signed transaction")
+            .Row("  \"complete\" : true|false,", {"boolean"}, "If the transaction has a complete set of signatures")
+            .Row("  ]")
+            .Row("}")
+            .ExampleCli("\"psbt\"")
+            .AsError();
 
     RPCTypeCheck(request.params, {UniValue::VSTR, UniValue::VBOOL, UniValue::VSTR});
 

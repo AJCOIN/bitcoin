@@ -12,14 +12,15 @@
 #include <checkpoints.h>
 #include <coins.h>
 #include <consensus/validation.h>
-#include <validation.h>
 #include <core_io.h>
+#include <hash.h>
 #include <index/txindex.h>
 #include <key_io.h>
 #include <policy/feerate.h>
 #include <policy/policy.h>
 #include <policy/rbf.h>
 #include <primitives/transaction.h>
+#include <rpc/doc.h>
 #include <rpc/server.h>
 #include <script/descriptor.h>
 #include <streams.h>
@@ -28,7 +29,7 @@
 #include <txmempool.h>
 #include <util.h>
 #include <utilstrencodings.h>
-#include <hash.h>
+#include <validation.h>
 #include <validationinterface.h>
 #include <versionbitsinfo.h>
 #include <warnings.h>
@@ -161,15 +162,13 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
 static UniValue getblockcount(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getblockcount\n"
-            "\nReturns the number of blocks in the longest blockchain.\n"
-            "\nResult:\n"
-            "n    (numeric) The current block count\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getblockcount", "")
-            + HelpExampleRpc("getblockcount", "")
-        );
+        throw RPCDoc("getblockcount", "")
+            .Desc("Returns the number of blocks in the longest blockchain.")
+            .Table("Result")
+            .Row("n", {"numeric"}, "The current block count")
+            .ExampleCli("")
+            .ExampleJson("")
+            .AsError();
 
     LOCK(cs_main);
     return chainActive.Height();
@@ -178,15 +177,13 @@ static UniValue getblockcount(const JSONRPCRequest& request)
 static UniValue getbestblockhash(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getbestblockhash\n"
-            "\nReturns the hash of the best (tip) block in the longest blockchain.\n"
-            "\nResult:\n"
-            "\"hex\"      (string) the block hash hex encoded\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getbestblockhash", "")
-            + HelpExampleRpc("getbestblockhash", "")
-        );
+        throw RPCDoc("getbestblockhash", "")
+            .Desc("Returns the hash of the best (tip) block in the longest blockchain.")
+            .Table("Result")
+            .Row("\"hex\"", {"string"}, "the block hash hex encoded")
+            .ExampleCli("")
+            .ExampleJson("")
+            .AsError();
 
     LOCK(cs_main);
     return chainActive.Tip()->GetBlockHash().GetHex();
@@ -669,17 +666,15 @@ static UniValue getmempoolentry(const JSONRPCRequest& request)
 static UniValue getblockhash(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "getblockhash height\n"
-            "\nReturns hash of block in best-block-chain at height provided.\n"
-            "\nArguments:\n"
-            "1. height         (numeric, required) The height index\n"
-            "\nResult:\n"
-            "\"hash\"         (string) The block hash\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getblockhash", "1000")
-            + HelpExampleRpc("getblockhash", "1000")
-        );
+        throw RPCDoc("getblockhash", "height")
+            .Desc("Returns hash of block in best-block-chain at height provided.")
+            .Table("Arguments")
+            .Row("1. height", {"numeric", "required"}, "The height index")
+            .Table("Result")
+            .Row("\"hash\"", {"string"}, "The block hash")
+            .ExampleCli("1000")
+            .ExampleJson("1000")
+            .AsError();
 
     LOCK(cs_main);
 
@@ -694,37 +689,37 @@ static UniValue getblockhash(const JSONRPCRequest& request)
 static UniValue getblockheader(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
-        throw std::runtime_error(
-            "getblockheader \"hash\" ( verbose )\n"
-            "\nIf verbose is false, returns a string that is serialized, hex-encoded data for blockheader 'hash'.\n"
-            "If verbose is true, returns an Object with information about blockheader <hash>.\n"
-            "\nArguments:\n"
-            "1. \"hash\"          (string, required) The block hash\n"
-            "2. verbose           (boolean, optional, default=true) true for a json object, false for the hex encoded data\n"
-            "\nResult (for verbose = true):\n"
-            "{\n"
-            "  \"hash\" : \"hash\",     (string) the block hash (same as provided)\n"
-            "  \"confirmations\" : n,   (numeric) The number of confirmations, or -1 if the block is not on the main chain\n"
-            "  \"height\" : n,          (numeric) The block height or index\n"
-            "  \"version\" : n,         (numeric) The block version\n"
-            "  \"versionHex\" : \"00000000\",  (string) The block version formatted in hexadecimal\n"
-            "  \"merkleroot\" : \"xxxx\",  (string) The merkle root\n"
-            "  \"time\" : ttt,          (numeric) The block time in seconds since epoch (Jan 1 1970 GMT)\n"
-            "  \"mediantime\" : ttt,    (numeric) The median block time in seconds since epoch (Jan 1 1970 GMT)\n"
-            "  \"nonce\" : n,           (numeric) The nonce\n"
-            "  \"bits\" : \"1d00ffff\",  (string) The bits\n"
-            "  \"difficulty\" : x.xxx,  (numeric) The difficulty\n"
-            "  \"chainwork\" : \"0000...1f3\"     (string) Expected number of hashes required to produce the current chain (in hex)\n"
-            "  \"nTx\" : n,             (numeric) The number of transactions in the block.\n"
-            "  \"previousblockhash\" : \"hash\",  (string) The hash of the previous block\n"
-            "  \"nextblockhash\" : \"hash\",      (string) The hash of the next block\n"
-            "}\n"
-            "\nResult (for verbose=false):\n"
-            "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash'.\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getblockheader", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
-            + HelpExampleRpc("getblockheader", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
-        );
+        throw RPCDoc("getblockheader", "\"hash\" ( verbose )")
+            .Desc(
+                "If verbose is false, returns a string that is serialized, hex-encoded data for blockheader 'hash'.\n"
+                "If verbose is true, returns an Object with information about blockheader <hash>."
+            )
+            .Table("Arguments")
+            .Row("1. \"hash\"", {"string", "required"}, "The block hash")
+            .Row("2. verbose", {"boolean", "optional", "default=true"}, "true for a json object, false for the hex encoded data")
+            .Table("Result (for verbose = true)")
+            .Row("{")
+            .Row("  \"hash\" : \"hash\",", {"string"}, "the block hash (same as provided)")
+            .Row("  \"confirmations\" : n,", {"numeric"}, "The number of confirmations, or -1 if the block is not on the main chain")
+            .Row("  \"height\" : n,", {"numeric"}, "The block height or index")
+            .Row("  \"version\" : n,", {"numeric"}, "The block version")
+            .Row("  \"versionHex\" : \"00000000\",", {"string"}, "The block version formatted in hexadecimal")
+            .Row("  \"merkleroot\" : \"xxxx\",", {"string"}, "The merkle root")
+            .Row("  \"time\" : ttt,", {"numeric"}, "The block time in seconds since epoch (Jan 1 1970 GMT)")
+            .Row("  \"mediantime\" : ttt,", {"numeric"}, "The median block time in seconds since epoch (Jan 1 1970 GMT)")
+            .Row("  \"nonce\" : n,", {"numeric"}, "The nonce")
+            .Row("  \"bits\" : \"1d00ffff\",", {"string"}, "The bits")
+            .Row("  \"difficulty\" : x.xxx,", {"numeric"}, "The difficulty")
+            .Row("  \"chainwork\" : \"0000...1f3\"", {"string"}, "Expected number of hashes required to produce the current chain (in hex)")
+            .Row("  \"nTx\" : n,", {"numeric"}, "The number of transactions in the block.")
+            .Row("  \"previousblockhash\" : \"hash\",", {"string"}, "The hash of the previous block")
+            .Row("  \"nextblockhash\" : \"hash\",", {"string"}, "The hash of the next block")
+            .Row("}")
+            .Table("Result (for verbose=false)")
+            .Row("\"data\"", {"string"}, "A string that is serialized, hex-encoded data for block 'hash'.")
+            .ExampleCli("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\""
+            .ExampleJson("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\""
+            .AsError();
 
     LOCK(cs_main);
 
@@ -772,53 +767,53 @@ static CBlock GetBlockChecked(const CBlockIndex* pblockindex)
 static UniValue getblock(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
-        throw std::runtime_error(
-            "getblock \"blockhash\" ( verbosity ) \n"
-            "\nIf verbosity is 0, returns a string that is serialized, hex-encoded data for block 'hash'.\n"
-            "If verbosity is 1, returns an Object with information about block <hash>.\n"
-            "If verbosity is 2, returns an Object with information about block <hash> and information about each transaction. \n"
-            "\nArguments:\n"
-            "1. \"blockhash\"          (string, required) The block hash\n"
-            "2. verbosity              (numeric, optional, default=1) 0 for hex encoded data, 1 for a json object, and 2 for json object with transaction data\n"
-            "\nResult (for verbosity = 0):\n"
-            "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash'.\n"
-            "\nResult (for verbosity = 1):\n"
-            "{\n"
-            "  \"hash\" : \"hash\",     (string) the block hash (same as provided)\n"
-            "  \"confirmations\" : n,   (numeric) The number of confirmations, or -1 if the block is not on the main chain\n"
-            "  \"size\" : n,            (numeric) The block size\n"
-            "  \"strippedsize\" : n,    (numeric) The block size excluding witness data\n"
-            "  \"weight\" : n           (numeric) The block weight as defined in BIP 141\n"
-            "  \"height\" : n,          (numeric) The block height or index\n"
-            "  \"version\" : n,         (numeric) The block version\n"
-            "  \"versionHex\" : \"00000000\",  (string) The block version formatted in hexadecimal\n"
-            "  \"merkleroot\" : \"xxxx\",  (string) The merkle root\n"
-            "  \"tx\" : [               (array of string) The transaction ids\n"
-            "     \"transactionid\"     (string) The transaction id\n"
-            "     ,...\n"
-            "  ],\n"
-            "  \"time\" : ttt,          (numeric) The block time in seconds since epoch (Jan 1 1970 GMT)\n"
-            "  \"mediantime\" : ttt,    (numeric) The median block time in seconds since epoch (Jan 1 1970 GMT)\n"
-            "  \"nonce\" : n,           (numeric) The nonce\n"
-            "  \"bits\" : \"1d00ffff\",  (string) The bits\n"
-            "  \"difficulty\" : x.xxx,  (numeric) The difficulty\n"
-            "  \"chainwork\" : \"xxxx\",  (string) Expected number of hashes required to produce the chain up to this block (in hex)\n"
-            "  \"nTx\" : n,             (numeric) The number of transactions in the block.\n"
-            "  \"previousblockhash\" : \"hash\",  (string) The hash of the previous block\n"
-            "  \"nextblockhash\" : \"hash\"       (string) The hash of the next block\n"
-            "}\n"
-            "\nResult (for verbosity = 2):\n"
-            "{\n"
-            "  ...,                     Same output as verbosity = 1.\n"
-            "  \"tx\" : [               (array of Objects) The transactions in the format of the getrawtransaction RPC. Different from verbosity = 1 \"tx\" result.\n"
-            "         ,...\n"
-            "  ],\n"
-            "  ,...                     Same output as verbosity = 1.\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getblock", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
-            + HelpExampleRpc("getblock", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
-        );
+        throw RPCDoc("getblock", "\"blockhash\" ( verbosity ) ")
+            .Desc(
+                "If verbosity is 0, returns a string that is serialized, hex-encoded data for block 'hash'.\n"
+                "If verbosity is 1, returns an Object with information about block <hash>.\n"
+                "If verbosity is 2, returns an Object with information about block <hash> and information about each transaction.")
+            .Table("Arguments")
+            .Row("1. \"blockhash\"", {"string", "required"}, "The block hash")
+            .Row("2. verbosity", {"numeric", "optional", "default=1"}, "0 for hex encoded data, 1 for a json object, and 2 for json object with transaction data")
+            .Table("Result (for verbosity = 0)")
+            .Row("\"data\"", {"string"}, "A string that is serialized, hex-encoded data for block 'hash'.")
+            .Table("Result (for verbosity = 1)")
+            .Row("{")
+            .Row("  \"hash\" : \"hash\",", {"string"}, "the block hash (same as provided)")
+            .Row("  \"confirmations\" : n,", {"numeric"}, "The number of confirmations, or -1 if the block is not on the main chain")
+            .Row("  \"size\" : n,", {"numeric"}, "The block size")
+            .Row("  \"strippedsize\" : n,", {"numeric"}, "The block size excluding witness data")
+            .Row("  \"weight\" : n", {"numeric"}, "The block weight as defined in BIP 141")
+            .Row("  \"height\" : n,", {"numeric"}, "The block height or index")
+            .Row("  \"version\" : n,", {"numeric"}, "The block version")
+            .Row("  \"versionHex\" : \"00000000\",", {"string"}, "The block version formatted in hexadecimal")
+            .Row("  \"merkleroot\" : \"xxxx\",", {"string"}, "The merkle root")
+            .Row("  \"tx\" : [", {"array of string"}, "The transaction ids")
+            .Row("     \"transactionid\"", {"string"}, "The transaction id")
+            .Row("     ,...")
+            .Row("  ],")
+            .Row("  \"time\" : ttt,", {"numeric"}, "The block time in seconds since epoch (Jan 1 1970 GMT)")
+            .Row("  \"mediantime\" : ttt,", {"numeric"}, "The median block time in seconds since epoch (Jan 1 1970 GMT)")
+            .Row("  \"nonce\" : n,", {"numeric"}, "The nonce")
+            .Row("  \"bits\" : \"1d00ffff\",", {"string"}, "The bits")
+            .Row("  \"difficulty\" : x.xxx,", {"numeric"}, "The difficulty")
+            .Row("  \"chainwork\" : \"xxxx\",", {"string"}, "Expected number of hashes required to produce the chain up to this block (in hex)")
+            .Row("  \"nTx\" : n,", {"numeric"}, "The number of transactions in the block.")
+            .Row("  \"previousblockhash\" : \"hash\",", {"string"}, "The hash of the previous block")
+            .Row("  \"nextblockhash\" : \"hash\"", {"string"}, "The hash of the next block")
+            .Row("}")
+            .Table("Result (for verbosity = 2)")
+            .Row("{")
+            .Row("  ...,", "Same output as verbosity = 1.")
+            .Row("  \"tx\" : [", {"array of Objects"}, "The transactions in the format of the getrawtransaction RPC. Different from verbosity = 1 \"tx\" result.")
+            .Row("         ,...")
+            .Row("  ],")
+            .Row("  ,...", "Same output as verbosity = 1.")
+            .Row("}")
+            .ExampleCli("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
+            .ExampleJson("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
+            .AsError();
+
 
     LOCK(cs_main);
 
@@ -1193,56 +1188,53 @@ static void BIP9SoftForkDescPushBack(UniValue& bip9_softforks, const Consensus::
 UniValue getblockchaininfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getblockchaininfo\n"
-            "Returns an object containing various state info regarding blockchain processing.\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"chain\": \"xxxx\",              (string) current network name as defined in BIP70 (main, test, regtest)\n"
-            "  \"blocks\": xxxxxx,             (numeric) the current number of blocks processed in the server\n"
-            "  \"headers\": xxxxxx,            (numeric) the current number of headers we have validated\n"
-            "  \"bestblockhash\": \"...\",       (string) the hash of the currently best block\n"
-            "  \"difficulty\": xxxxxx,         (numeric) the current difficulty\n"
-            "  \"mediantime\": xxxxxx,         (numeric) median time for the current best block\n"
-            "  \"verificationprogress\": xxxx,  (numeric) estimate of verification progress [0..1]\n"
-            "  \"initialblockdownload\": xxxx,  (bool, debug information) estimate of whether this node is in Initial Block Download mode.\n"
-            "  \"chainwork\": \"xxxx\"           (string) total amount of work in active chain, in hexadecimal\n"
-            "  \"size_on_disk\": xxxxxx,       (numeric) the estimated size of the block and undo files on disk\n"
-            "  \"pruned\": xx,                 (boolean) if the blocks are subject to pruning\n"
-            "  \"pruneheight\": xxxxxx,        (numeric) lowest-height complete block stored (only present if pruning is enabled)\n"
-            "  \"automatic_pruning\": xx,      (boolean) whether automatic pruning is enabled (only present if pruning is enabled)\n"
-            "  \"prune_target_size\": xxxxxx,  (numeric) the target size used by pruning (only present if automatic pruning is enabled)\n"
-            "  \"softforks\": [                (array) status of softforks in progress\n"
-            "     {\n"
-            "        \"id\": \"xxxx\",           (string) name of softfork\n"
-            "        \"version\": xx,          (numeric) block version\n"
-            "        \"reject\": {             (object) progress toward rejecting pre-softfork blocks\n"
-            "           \"status\": xx,        (boolean) true if threshold reached\n"
-            "        },\n"
-            "     }, ...\n"
-            "  ],\n"
-            "  \"bip9_softforks\": {           (object) status of BIP9 softforks in progress\n"
-            "     \"xxxx\" : {                 (string) name of the softfork\n"
-            "        \"status\": \"xxxx\",       (string) one of \"defined\", \"started\", \"locked_in\", \"active\", \"failed\"\n"
-            "        \"bit\": xx,              (numeric) the bit (0-28) in the block version field used to signal this softfork (only for \"started\" status)\n"
-            "        \"startTime\": xx,        (numeric) the minimum median time past of a block at which the bit gains its meaning\n"
-            "        \"timeout\": xx,          (numeric) the median time past of a block at which the deployment is considered failed if not yet locked in\n"
-            "        \"since\": xx,            (numeric) height of the first block to which the status applies\n"
-            "        \"statistics\": {         (object) numeric statistics about BIP9 signalling for a softfork (only for \"started\" status)\n"
-            "           \"period\": xx,        (numeric) the length in blocks of the BIP9 signalling period \n"
-            "           \"threshold\": xx,     (numeric) the number of blocks with the version bit set required to activate the feature \n"
-            "           \"elapsed\": xx,       (numeric) the number of blocks elapsed since the beginning of the current period \n"
-            "           \"count\": xx,         (numeric) the number of blocks with the version bit set in the current period \n"
-            "           \"possible\": xx       (boolean) returns false if there are not enough blocks left in this period to pass activation threshold \n"
-            "        }\n"
-            "     }\n"
-            "  }\n"
-            "  \"warnings\" : \"...\",           (string) any network and blockchain warnings.\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getblockchaininfo", "")
-            + HelpExampleRpc("getblockchaininfo", "")
-        );
+        throw RPCDoc("getblockchaininfo", "")
+            .Desc("Returns an object containing various state info regarding blockchain processing.")
+            .Table("Result")
+            .Row("{")
+            .Row("  \"chain\": \"xxxx\",", {"string"}, "current network name as defined in BIP70 (main, test, regtest)")
+            .Row("  \"blocks\": xxxxxx,", {"numeric"}, "the current number of blocks processed in the server")
+            .Row("  \"headers\": xxxxxx,", {"numeric"}, "the current number of headers we have validated")
+            .Row("  \"bestblockhash\": \"...\",", {"string"}, "the hash of the currently best block")
+            .Row("  \"difficulty\": xxxxxx,", {"numeric"}, "the current difficulty")
+            .Row("  \"mediantime\": xxxxxx,", {"numeric"}, "median time for the current best block")
+            .Row("  \"verificationprogress\": xxxx,", {"numeric"}, "estimate of verification progress [0..1]")
+            .Row("  \"initialblockdownload\": xxxx,", {"bool", "debug information"}, "estimate of whether this node is in Initial Block Download mode.")
+            .Row("  \"chainwork\": \"xxxx\"", {"string"}, "total amount of work in active chain, in hexadecimal")
+            .Row("  \"size_on_disk\": xxxxxx,", {"numeric"}, "the estimated size of the block and undo files on disk")
+            .Row("  \"pruned\": xx,", {"boolean"}, "if the blocks are subject to pruning")
+            .Row("  \"pruneheight\": xxxxxx,", {"numeric"}, "lowest-height complete block stored (only present if pruning is enabled)")
+            .Row("  \"automatic_pruning\": xx,", {"boolean"}, "whether automatic pruning is enabled (only present if pruning is enabled)")
+            .Row("  \"prune_target_size\": xxxxxx,", {"numeric"}, "the target size used by pruning (only present if automatic pruning is enabled)")
+            .Row("  \"softforks\": [", {"array"}, "status of softforks in progress")
+            .Row("     {")
+            .Row("        \"id\": \"xxxx\",", {"string"}, "name of softfork")
+            .Row("        \"version\": xx,", {"numeric"}, "block version")
+            .Row("        \"reject\": {", {"object"}, "progress toward rejecting pre-softfork blocks")
+            .Row("           \"status\": xx,", {"boolean"}, "true if threshold reached")
+            .Row("        },")
+            .Row("     }, ...")
+            .Row("  ],")
+            .Row("  \"bip9_softforks\": {", {"object"}, "status of BIP9 softforks in progress")
+            .Row("     \"xxxx\" : {", {"string"}, "name of the softfork")
+            .Row("        \"status\": \"xxxx\",", {"string"}, "one of \"defined\", \"started\", \"locked_in\", \"active\", \"failed\"")
+            .Row("        \"bit\": xx,", {"numeric"}, "the bit (0-28) in the block version field used to signal this softfork (only for \"started\" status)")
+            .Row("        \"startTime\": xx,", {"numeric"}, "the minimum median time past of a block at which the bit gains its meaning")
+            .Row("        \"timeout\": xx,", {"numeric"}, "the median time past of a block at which the deployment is considered failed if not yet locked in")
+            .Row("        \"since\": xx,", {"numeric"}, "height of the first block to which the status applies")
+            .Row("        \"statistics\": {", {"object"}, "numeric statistics about BIP9 signalling for a softfork (only for \"started\" status)")
+            .Row("           \"period\": xx,", {"numeric"}, "the length in blocks of the BIP9 signalling period")
+            .Row("           \"threshold\": xx,", {"numeric"}, "the number of blocks with the version bit set required to activate the feature")
+            .Row("           \"elapsed\": xx,", {"numeric"}, "the number of blocks elapsed since the beginning of the current period")
+            .Row("           \"count\": xx,", {"numeric"}, "the number of blocks with the version bit set in the current period")
+            .Row("           \"possible\": xx", {"boolean"}, "returns false if there are not enough blocks left in this period to pass activation threshold")
+            .Row("        }")
+            .Row("     }")
+            .Row("  }")
+            .Row("  \"warnings\" : \"...\",", {"string"}, "any network and blockchain warnings.")
+            .ExampleCli("")
+            .ExampleJson("")
+            .AsError();
 
     LOCK(cs_main);
 
@@ -1689,61 +1681,60 @@ static constexpr size_t PER_UTXO_OVERHEAD = sizeof(COutPoint) + sizeof(uint32_t)
 static UniValue getblockstats(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 4) {
-        throw std::runtime_error(
-            "getblockstats hash_or_height ( stats )\n"
-            "\nCompute per block statistics for a given window. All amounts are in satoshis.\n"
-            "It won't work for some heights with pruning.\n"
-            "It won't work without -txindex for utxo_size_inc, *fee or *feerate stats.\n"
-            "\nArguments:\n"
-            "1. \"hash_or_height\"     (string or numeric, required) The block hash or height of the target block\n"
-            "2. \"stats\"              (array,  optional) Values to plot, by default all values (see result below)\n"
-            "    [\n"
-            "      \"height\",         (string, optional) Selected statistic\n"
-            "      \"time\",           (string, optional) Selected statistic\n"
-            "      ,...\n"
-            "    ]\n"
-            "\nResult:\n"
-            "{                           (json object)\n"
-            "  \"avgfee\": xxxxx,          (numeric) Average fee in the block\n"
-            "  \"avgfeerate\": xxxxx,      (numeric) Average feerate (in satoshis per virtual byte)\n"
-            "  \"avgtxsize\": xxxxx,       (numeric) Average transaction size\n"
-            "  \"blockhash\": xxxxx,       (string) The block hash (to check for potential reorgs)\n"
-            "  \"feerate_percentiles\": [  (array of numeric) Feerates at the 10th, 25th, 50th, 75th, and 90th percentile weight unit (in satoshis per virtual byte)\n"
-            "      \"10th_percentile_feerate\",      (numeric) The 10th percentile feerate\n"
-            "      \"25th_percentile_feerate\",      (numeric) The 25th percentile feerate\n"
-            "      \"50th_percentile_feerate\",      (numeric) The 50th percentile feerate\n"
-            "      \"75th_percentile_feerate\",      (numeric) The 75th percentile feerate\n"
-            "      \"90th_percentile_feerate\",      (numeric) The 90th percentile feerate\n"
-            "  ],\n"
-            "  \"height\": xxxxx,          (numeric) The height of the block\n"
-            "  \"ins\": xxxxx,             (numeric) The number of inputs (excluding coinbase)\n"
-            "  \"maxfee\": xxxxx,          (numeric) Maximum fee in the block\n"
-            "  \"maxfeerate\": xxxxx,      (numeric) Maximum feerate (in satoshis per virtual byte)\n"
-            "  \"maxtxsize\": xxxxx,       (numeric) Maximum transaction size\n"
-            "  \"medianfee\": xxxxx,       (numeric) Truncated median fee in the block\n"
-            "  \"mediantime\": xxxxx,      (numeric) The block median time past\n"
-            "  \"mediantxsize\": xxxxx,    (numeric) Truncated median transaction size\n"
-            "  \"minfee\": xxxxx,          (numeric) Minimum fee in the block\n"
-            "  \"minfeerate\": xxxxx,      (numeric) Minimum feerate (in satoshis per virtual byte)\n"
-            "  \"mintxsize\": xxxxx,       (numeric) Minimum transaction size\n"
-            "  \"outs\": xxxxx,            (numeric) The number of outputs\n"
-            "  \"subsidy\": xxxxx,         (numeric) The block subsidy\n"
-            "  \"swtotal_size\": xxxxx,    (numeric) Total size of all segwit transactions\n"
-            "  \"swtotal_weight\": xxxxx,  (numeric) Total weight of all segwit transactions divided by segwit scale factor (4)\n"
-            "  \"swtxs\": xxxxx,           (numeric) The number of segwit transactions\n"
-            "  \"time\": xxxxx,            (numeric) The block time\n"
-            "  \"total_out\": xxxxx,       (numeric) Total amount in all outputs (excluding coinbase and thus reward [ie subsidy + totalfee])\n"
-            "  \"total_size\": xxxxx,      (numeric) Total size of all non-coinbase transactions\n"
-            "  \"total_weight\": xxxxx,    (numeric) Total weight of all non-coinbase transactions divided by segwit scale factor (4)\n"
-            "  \"totalfee\": xxxxx,        (numeric) The fee total\n"
-            "  \"txs\": xxxxx,             (numeric) The number of transactions (excluding coinbase)\n"
-            "  \"utxo_increase\": xxxxx,   (numeric) The increase/decrease in the number of unspent outputs\n"
-            "  \"utxo_size_inc\": xxxxx,   (numeric) The increase/decrease in size for the utxo index (not discounting op_return and similar)\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getblockstats", "1000 '[\"minfeerate\",\"avgfeerate\"]'")
-            + HelpExampleRpc("getblockstats", "1000 '[\"minfeerate\",\"avgfeerate\"]'")
-        );
+        throw RPCDoc("getblockstats", "hash_or_height ( stats )")
+            .Desc(
+                "Compute per block statistics for a given window. All amounts are in satoshis.\n"
+                "It won't work for some heights with pruning.\n"
+                "It won't work without -txindex for utxo_size_inc, *fee or *feerate stats.")
+            .Table("Arguments")
+            .Row("1. \"hash_or_height\"", {"string or numeric", "required"}, "The block hash or height of the target block")
+            .Row("2. \"stats\"", {"array", " optional"}, "Values to plot, by default all values (see result below)")
+            .Row("    [")
+            .Row("      \"height\",", {"string", "optional"}, "Selected statistic")
+            .Row("      \"time\",", {"string", "optional"}, "Selected statistic")
+            .Row("      ,...")
+            .Row("    ]")
+            .Table("Result")
+            .Row("{", {"json object"})
+            .Row("  \"avgfee\": xxxxx,", {"numeric"}, "Average fee in the block")
+            .Row("  \"avgfeerate\": xxxxx,", {"numeric"}, "Average feerate (in satoshis per virtual byte)")
+            .Row("  \"avgtxsize\": xxxxx,", {"numeric"}, "Average transaction size")
+            .Row("  \"blockhash\": xxxxx,", {"string"}, "The block hash (to check for potential reorgs)")
+            .Row("  \"feerate_percentiles\": [", {"array of numeric"}, "Feerates at the 10th, 25th, 50th, 75th, and 90th percentile weight unit (in satoshis per virtual byte)")
+            .Row("      \"10th_percentile_feerate\",", {"numeric"}, "The 10th percentile feerate")
+            .Row("      \"25th_percentile_feerate\",", {"numeric"}, "The 25th percentile feerate")
+            .Row("      \"50th_percentile_feerate\",", {"numeric"}, "The 50th percentile feerate")
+            .Row("      \"75th_percentile_feerate\",", {"numeric"}, "The 75th percentile feerate")
+            .Row("      \"90th_percentile_feerate\",", {"numeric"}, "The 90th percentile feerate")
+            .Row("  ],")
+            .Row("  \"height\": xxxxx,", {"numeric"}, "The height of the block")
+            .Row("  \"ins\": xxxxx,", {"numeric"}, "The number of inputs (excluding coinbase)")
+            .Row("  \"maxfee\": xxxxx,", {"numeric"}, "Maximum fee in the block")
+            .Row("  \"maxfeerate\": xxxxx,", {"numeric"}, "Maximum feerate (in satoshis per virtual byte)")
+            .Row("  \"maxtxsize\": xxxxx,", {"numeric"}, "Maximum transaction size")
+            .Row("  \"medianfee\": xxxxx,", {"numeric"}, "Truncated median fee in the block")
+            .Row("  \"mediantime\": xxxxx,", {"numeric"}, "The block median time past")
+            .Row("  \"mediantxsize\": xxxxx,", {"numeric"}, "Truncated median transaction size")
+            .Row("  \"minfee\": xxxxx,", {"numeric"}, "Minimum fee in the block")
+            .Row("  \"minfeerate\": xxxxx,", {"numeric"}, "Minimum feerate (in satoshis per virtual byte)")
+            .Row("  \"mintxsize\": xxxxx,", {"numeric"}, "Minimum transaction size")
+            .Row("  \"outs\": xxxxx,", {"numeric"}, "The number of outputs")
+            .Row("  \"subsidy\": xxxxx,", {"numeric"}, "The block subsidy")
+            .Row("  \"swtotal_size\": xxxxx,", {"numeric"}, "Total size of all segwit transactions")
+            .Row("  \"swtotal_weight\": xxxxx,", {"numeric"}, "Total weight of all segwit transactions divided by segwit scale factor (4)")
+            .Row("  \"swtxs\": xxxxx,", {"numeric"}, "The number of segwit transactions")
+            .Row("  \"time\": xxxxx,", {"numeric"}, "The block time")
+            .Row("  \"total_out\": xxxxx,", {"numeric"}, "Total amount in all outputs (excluding coinbase and thus reward [ie subsidy + totalfee])")
+            .Row("  \"total_size\": xxxxx,", {"numeric"}, "Total size of all non-coinbase transactions")
+            .Row("  \"total_weight\": xxxxx,", {"numeric"}, "Total weight of all non-coinbase transactions divided by segwit scale factor (4)")
+            .Row("  \"totalfee\": xxxxx,", {"numeric"}, "The fee total")
+            .Row("  \"txs\": xxxxx,", {"numeric"}, "The number of transactions (excluding coinbase)")
+            .Row("  \"utxo_increase\": xxxxx,", {"numeric"}, "The increase/decrease in the number of unspent outputs")
+            .Row("  \"utxo_size_inc\": xxxxx,", {"numeric"}, "The increase/decrease in size for the utxo index (not discounting op_return and similar)")
+            .Row("}")
+            .ExampleCli("1000 '[\"minfeerate\",\"avgfeerate\"]'")
+            .ExampleJson("1000 '[\"minfeerate\",\"avgfeerate\"]'")
+            .AsError();
     }
 
     LOCK(cs_main);
@@ -2040,7 +2031,7 @@ UniValue scantxoutset(const JSONRPCRequest& request)
             "scantxoutset <action> ( <scanobjects> )\n"
             "\nEXPERIMENTAL warning: this call may be removed or changed in future releases.\n"
             "\nScans the unspent transaction output set for entries that match certain output descriptors.\n"
-            "\nIn the desctiptors below, <pubkey> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one\n"
+            "\nIn the descriptors below, <pubkey> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one\n"
             "or more path elements separated by `/`, and optionally ending in `/*` (unhardened), or `/*'` or `/*h` (hardened) to specify all\n"
             "unhardened or hardened child keys.\n"
             "In the latter case, a range needs to be specified by below if different from 1000.\n"
