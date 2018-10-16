@@ -22,7 +22,7 @@ void CThreadInterrupt::reset()
 void CThreadInterrupt::operator()()
 {
     {
-        LOCK(mut);
+        LOCK(mutex);
         flag.store(true, std::memory_order_release);
     }
     cond.notify_all();
@@ -30,7 +30,7 @@ void CThreadInterrupt::operator()()
 
 bool CThreadInterrupt::sleep_for(std::chrono::milliseconds rel_time)
 {
-    WAIT_LOCK(mut, lock);
+    WAIT_LOCK(mutex, lock);
     return !cond.wait_for(lock, rel_time, [this]() { return flag.load(std::memory_order_acquire); });
 }
 

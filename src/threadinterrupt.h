@@ -30,7 +30,7 @@ public:
 
 private:
     std::condition_variable cond;
-    Mutex mut;
+    Mutex mutex;
     std::atomic<bool> flag;
 };
 
