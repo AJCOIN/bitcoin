@@ -189,7 +189,7 @@ RPCDoc& RPCDoc::Row(const std::string& code, const std::initializer_list<std::st
 
 RPCDoc& RPCDoc::Rows(const std::vector<RPCDocTableRow>& rows)
 {
-    for (auto const& row: rows) {
+    for (auto const& row : rows) {
         m_tables.back().AddRow(row);
     }
     return *this;
@@ -220,7 +220,7 @@ RPCDoc& RPCDoc::ExampleRpc(const std::string& description, const std::string& me
         description,
         "curl --user myusername --data-binary '{\"jsonrpc\": \"1.0\", \"id\":\"curltest\", "
         "\"method\": \"" +
-        methodName + "\", \"params\": [" + args + "] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/"));
+            methodName + "\", \"params\": [" + args + "] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/"));
     return *this;
 }
 

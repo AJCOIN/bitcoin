@@ -206,8 +206,7 @@ static UniValue waitfornewblock(const JSONRPCRequest& request)
             .Desc(
                 "Waits for a specific new block and returns useful info about it.\n"
                 "\n"
-                "Returns the current block on timeout or exit."
-            )
+                "Returns the current block on timeout or exit.")
             .Table("Arguments")
             .Row("1. timeout", {"int", "optional", "default=0"}, "Time in milliseconds to wait for a response. 0 indicates no timeout.")
             .Table("Result")
@@ -246,8 +245,7 @@ static UniValue waitforblock(const JSONRPCRequest& request)
             .Desc(
                 "Waits for a specific new block and returns useful info about it.\n"
                 "\n"
-                "Returns the current block on timeout or exit."
-            )
+                "Returns the current block on timeout or exit.")
             .Table("Arguments")
             .Row("1. \"blockhash\"", {"required", "string"}, "Block hash to wait for.")
             .Row("2. timeout", {"int", "optional", "default=0"}, "Time in milliseconds to wait for a response. 0 indicates no timeout.")
@@ -291,8 +289,7 @@ static UniValue waitforblockheight(const JSONRPCRequest& request)
                 "Waits for (at least) block height and returns the height and hash\n"
                 "of the current tip.\n"
                 "\n"
-                "Returns the current block on timeout or exit."
-            )
+                "Returns the current block on timeout or exit.")
             .Table("Arguments")
             .Row("1. height", {"required", "int"}, "Block height to wait for (int)")
             .Row("2. timeout", {"int", "optional", "default=0"}, "Time in milliseconds to wait for a response. 0 indicates no timeout.")
@@ -382,8 +379,7 @@ static std::vector<RPCDocTableRow> EntryDescription()
         RPCDocTableRow("    \"spentby\" : [", {"array"}, "unconfirmed transactions spending outputs from this transaction"),
         RPCDocTableRow("        \"transactionid\",", {"string"}, "child transaction id"),
         RPCDocTableRow("       ... ]"),
-        RPCDocTableRow("    \"bip125-replaceable\" : true|false,", {"boolean"}, "Whether this transaction could be replaced due to BIP125 (replace-by-fee)")
-    };
+        RPCDocTableRow("    \"bip125-replaceable\" : true|false,", {"boolean"}, "Whether this transaction could be replaced due to BIP125 (replace-by-fee)")};
 }
 
 static void entryToJSON(UniValue &info, const CTxMemPoolEntry &e) EXCLUSIVE_LOCKS_REQUIRED(::mempool.cs)
@@ -481,8 +477,7 @@ static UniValue getrawmempool(const JSONRPCRequest& request)
             .Desc(
                 "Returns all transaction ids in memory pool as a json array of string transaction ids.\n"
                 "\n"
-                "Hint: use getmempoolentry to fetch a specific transaction from the mempool."
-            )
+                "Hint: use getmempoolentry to fetch a specific transaction from the mempool.")
             .Table("Arguments")
             .Row("1. verbose", {"boolean", "optional", "default=false"}, "True for a json object, false for array of transaction ids")
             .Table("Result: (for verbose = false)")
@@ -922,8 +917,7 @@ static UniValue pruneblockchain(const JSONRPCRequest& request)
             .Table("Arguments")
             .Row("1. \"height\"", {"numeric", "required"},
                 "The block height to prune up to. May be set to a discrete height, or a unix timestamp\n"
-                "to prune blocks whose block time is at least 2 hours older than the provided timestamp."
-            )
+                "to prune blocks whose block time is at least 2 hours older than the provided timestamp.")
             .Table("Result")
             .Row("n", {"numeric"}, "Height of the last block pruned.")
             .ExampleCli("1000")
@@ -971,8 +965,7 @@ static UniValue gettxoutsetinfo(const JSONRPCRequest& request)
         throw RPCDoc("gettxoutsetinfo", "")
             .Desc(
                 "Returns statistics about the unspent transaction output set.\n"
-                "Note this call may take some time."
-            )
+                "Note this call may take some time.")
             .Table("Result")
             .Row("{")
             .Row("  \"height\":n,", {"numeric"}, "The current block height (index)")
@@ -1010,7 +1003,7 @@ static UniValue gettxoutsetinfo(const JSONRPCRequest& request)
 UniValue gettxout(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 3)
-      throw RPCDoc("gettxout", "\"txid\" n ( include_mempool )")
+        throw RPCDoc("gettxout", "\"txid\" n ( include_mempool )")
             .Desc("Returns details about an unspent transaction output.")
             .Table("Arguments")
             .Row("1. \"txid\"", {"string", "required"}, "The transaction id")
@@ -1433,8 +1426,7 @@ static UniValue preciousblock(const JSONRPCRequest& request)
                 "\n"
                 "A later preciousblock call can override the effect of an earlier one.\n"
                 "\n"
-                "The effects of preciousblock are not retained across restarts."
-            )
+                "The effects of preciousblock are not retained across restarts.")
             .Table("Arguments")
             .Row("1. \"blockhash\"", {"string", "required"}, "the hash of the block to mark as precious")
             .ExampleCli("\"blockhash\"")
@@ -1503,8 +1495,7 @@ static UniValue reconsiderblock(const JSONRPCRequest& request)
         throw RPCDoc("reconsiderblock", "\"blockhash\"")
             .Desc(
                 "Removes invalidity status of a block and its descendants, reconsider them for activation.\n"
-                "This can be used to undo the effects of invalidateblock."
-            )
+                "This can be used to undo the effects of invalidateblock.")
             .Table("Arguments")
             .Row("1. \"blockhash\"", {"string", "required"}, "the hash of the block to reconsider")
             .ExampleCli("\"blockhash\"")
@@ -2018,8 +2009,7 @@ UniValue scantxoutset(const JSONRPCRequest& request)
                 "or more path elements separated by `/`, and optionally ending in `/*` (unhardened), or `/*'` or `/*h` (hardened) to specify all\n"
                 "unhardened or hardened child keys.\n"
                 "In the latter case, a range needs to be specified by below if different from 1000.\n"
-                "For more information on output descriptors, see the documentation in the doc/descriptors.md file."
-            )
+                "For more information on output descriptors, see the documentation in the doc/descriptors.md file.")
             .Table("Examples of output descriptors")
             .Row("addr(<address>)", "Outputs whose scriptPubKey corresponds to the specified address (does not include P2PK)")
             .Row("raw(<hex script>)", "Outputs whose scriptPubKey equals the specified hex scripts")
@@ -2031,8 +2021,7 @@ UniValue scantxoutset(const JSONRPCRequest& request)
                 "The action to execute\n"
                 "- \"start\" for starting a scan\n"
                 "- \"abort\" for aborting the current scan (returns true when abort was successful)\n"
-                "- \"status\" for progress report (in %) of the current scan"
-            )
+                "- \"status\" for progress report (in %) of the current scan")
             .Row("2. \"scanobjects\"", {"array", "required"}, "Array of scan objects")
             .Row("    [", "Every scan object is either a string descriptor or an object:")
             .Row("        \"descriptor\",", {"string", "optional"}, "An output descriptor")
@@ -2049,7 +2038,7 @@ UniValue scantxoutset(const JSONRPCRequest& request)
             .Row("    \"txid\" : \"transactionid\",", {"string"}, "The transaction id")
             .Row("    \"vout\": n,", {"numeric"}, "the vout value")
             .Row("    \"scriptPubKey\" : \"script\",", {"string"}, "the script key")
-            .Row("    \"amount\" : x.xxx,", {"numeric"}, "The total amount in "+CURRENCY_UNIT+" of the unspent output")
+            .Row("    \"amount\" : x.xxx,", {"numeric"}, "The total amount in " + CURRENCY_UNIT + " of the unspent output")
             .Row("    \"height\" : n,", {"numeric"}, "Height of the unspent transaction output")
             .Row("   }")
             .Row("   ,...], ")
