@@ -40,7 +40,7 @@ RPCDocTableRow::RPCDocTableRow(const std::string& code, const std::string& descr
 {
 }
 
-RPCDocTableRow::RPCDocTableRow(const std::string& code, const std::vector<std::string>& types, const std::string& description)
+RPCDocTableRow::RPCDocTableRow(const std::string& code, const std::initializer_list<std::string>& types, const std::string& description)
     : m_code(code), m_types(types), m_description(description)
 {
 }
@@ -134,6 +134,11 @@ RPCDoc::RPCDoc(std::string methodName, std::string firstArguments)
 {
 }
 
+RPCDoc::RPCDoc(std::string methodName)
+    : m_methodName(methodName), m_firstArguments("")
+{
+}
+
 RPCDoc& RPCDoc::Desc(const std::string& description)
 {
     m_description = description;
@@ -164,7 +169,7 @@ RPCDoc& RPCDoc::Row(const std::string& code, const std::string& description)
     return *this;
 }
 
-RPCDoc& RPCDoc::Row(const std::string& code, const std::vector<std::string>& types, const std::string& description)
+RPCDoc& RPCDoc::Row(const std::string& code, const std::initializer_list<std::string>& types, const std::string& description)
 {
     if (m_tables.empty()) {
         throw std::out_of_range("No table in RPC doc.");
@@ -173,6 +178,22 @@ RPCDoc& RPCDoc::Row(const std::string& code, const std::vector<std::string>& typ
     return *this;
 }
 
+RPCDoc& RPCDoc::Row(const std::string& code, const std::initializer_list<std::string>& types)
+{
+    if (m_tables.empty()) {
+        throw std::out_of_range("No table in RPC doc.");
+    }
+    m_tables.back().AddRow(RPCDocTableRow(code, types, ""));
+    return *this;
+}
+
+RPCDoc& RPCDoc::Rows(const std::vector<RPCDocTableRow>& rows)
+{
+    for (auto const& row: rows) {
+        m_tables.back().AddRow(row);
+    }
+    return *this;
+}
 
 RPCDoc& RPCDoc::Example(const std::string& code)
 {
@@ -186,19 +207,41 @@ RPCDoc& RPCDoc::Example(const std::string& code, const std::string& example)
     return *this;
 }
 
+RPCDoc& RPCDoc::ExampleCli(const std::string& description, const std::string& methodName, const std::string& args)
+{
+    m_examples.push_back(
+        RPCDocExample(description, "bitcoin-cli " + methodName + " " + args));
+    return *this;
+}
+
+RPCDoc& RPCDoc::ExampleRpc(const std::string& description, const std::string& methodName, const std::string& args)
+{
+    m_examples.push_back(RPCDocExample(
+        description,
+        "curl --user myusername --data-binary '{\"jsonrpc\": \"1.0\", \"id\":\"curltest\", "
+        "\"method\": \"" +
+        methodName + "\", \"params\": [" + args + "] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/"));
+    return *this;
+}
+
+RPCDoc& RPCDoc::ExampleCli(const std::string& description, const std::string& args)
+{
+    return ExampleCli(description, m_methodName, args);
+}
+
+RPCDoc& RPCDoc::ExampleRpc(const std::string& description, const std::string& args)
+{
+    return ExampleRpc(description, m_methodName, args);
+}
+
 RPCDoc& RPCDoc::ExampleCli(const std::string& args)
 {
-    m_examples.push_back(RPCDocExample("bitcoin-cli " + m_methodName + " " + args));
-    return *this;
+    return ExampleCli("", args);
 }
 
 RPCDoc& RPCDoc::ExampleRpc(const std::string& args)
 {
-    m_examples.push_back(RPCDocExample(
-        "curl --user myusername --data-binary '{\"jsonrpc\": \"1.0\", \"id\":\"curltest\", "
-        "\"method\": \"" +
-        m_methodName + "\", \"params\": [" + args + "] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/"));
-    return *this;
+    return ExampleRpc("", args);
 }
 
 std::string RPCDoc::AsText() const

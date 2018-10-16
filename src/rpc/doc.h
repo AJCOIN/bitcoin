@@ -36,7 +36,7 @@ private:
 public:
     RPCDocTableRow(const std::string& code);
     RPCDocTableRow(const std::string& code, const std::string& description);
-    RPCDocTableRow(const std::string& code, const std::vector<std::string>& types, const std::string& description);
+    RPCDocTableRow(const std::string& code, const std::initializer_list<std::string>& types, const std::string& description);
     std::string const& Code() const;
     std::vector<std::string> const& Types() const;
     std::vector<std::string> DescriptionLines() const;
@@ -67,18 +67,27 @@ private:
     std::vector<RPCDocExample> m_examples;
 
 public:
+    RPCDoc(std::string methodName);
     RPCDoc(std::string methodName, std::string firstArguments);
 
     RPCDoc& Desc(const std::string& description);
     RPCDoc& Table(const std::string& name);
     RPCDoc& Row(const std::string& code);
+    RPCDoc& Row(const std::string& code, const std::initializer_list<std::string>& types);
     RPCDoc& Row(const std::string& code, const std::string& description);
-    RPCDoc& Row(const std::string& code, const std::vector<std::string>& types, const std::string& description);
+    RPCDoc& Row(const std::string& code, const std::initializer_list<std::string>& types, const std::string& description);
+    RPCDoc& Rows(const std::vector<RPCDocTableRow>& rows);
     RPCDoc& Example(const std::string& code);
     RPCDoc& Example(const std::string& description, const std::string& code);
 
     RPCDoc& ExampleCli(const std::string& args);
     RPCDoc& ExampleRpc(const std::string& args);
+
+    RPCDoc& ExampleCli(const std::string& description, const std::string& args);
+    RPCDoc& ExampleRpc(const std::string& description, const std::string& args);
+
+    RPCDoc& ExampleCli(const std::string& description, const std::string& methodName, const std::string& args);
+    RPCDoc& ExampleRpc(const std::string& description, const std::string& methodName, const std::string& args);
 
     std::string AsText() const;
     std::runtime_error AsError() const;

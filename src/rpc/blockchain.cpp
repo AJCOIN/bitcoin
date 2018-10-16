@@ -202,21 +202,23 @@ void RPCNotifyBlockChange(bool ibd, const CBlockIndex * pindex)
 static UniValue waitfornewblock(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 1)
-        throw std::runtime_error(
-            "waitfornewblock (timeout)\n"
-            "\nWaits for a specific new block and returns useful info about it.\n"
-            "\nReturns the current block on timeout or exit.\n"
-            "\nArguments:\n"
-            "1. timeout  (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
-            "\nResult:\n"
-            "{                           (json object)\n"
-            "  \"hash\" : {       (string) The blockhash\n"
-            "  \"height\" : {     (int) Block height\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("waitfornewblock", "1000")
-            + HelpExampleRpc("waitfornewblock", "1000")
-        );
+        throw RPCDoc("waitfornewblock", "(timeout)")
+            .Desc(
+                "Waits for a specific new block and returns useful info about it.\n"
+                "\n"
+                "Returns the current block on timeout or exit."
+            )
+            .Table("Arguments")
+            .Row("1. timeout", {"int", "optional", "default=0"}, "Time in milliseconds to wait for a response. 0 indicates no timeout.")
+            .Table("Result")
+            .Row("{", {"json object"})
+            .Row("  \"hash\" : {", {"string"}, "The blockhash")
+            .Row("  \"height\" : {", {"int"}, "Block height")
+            .Row("}")
+            .ExampleCli("1000")
+            .ExampleRpc("1000")
+            .AsError();
+
     int timeout = 0;
     if (!request.params[0].isNull())
         timeout = request.params[0].get_int();
@@ -240,22 +242,24 @@ static UniValue waitfornewblock(const JSONRPCRequest& request)
 static UniValue waitforblock(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
-        throw std::runtime_error(
-            "waitforblock <blockhash> (timeout)\n"
-            "\nWaits for a specific new block and returns useful info about it.\n"
-            "\nReturns the current block on timeout or exit.\n"
-            "\nArguments:\n"
-            "1. \"blockhash\"  (required, string) Block hash to wait for.\n"
-            "2. timeout        (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
-            "\nResult:\n"
-            "{                           (json object)\n"
-            "  \"hash\" : {       (string) The blockhash\n"
-            "  \"height\" : {     (int) Block height\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("waitforblock", "\"0000000000079f8ef3d2c688c244eb7a4570b24c9ed7b4a8c619eb02596f8862\", 1000")
-            + HelpExampleRpc("waitforblock", "\"0000000000079f8ef3d2c688c244eb7a4570b24c9ed7b4a8c619eb02596f8862\", 1000")
-        );
+        throw RPCDoc("waitforblock", "<blockhash> (timeout)")
+            .Desc(
+                "Waits for a specific new block and returns useful info about it.\n"
+                "\n"
+                "Returns the current block on timeout or exit."
+            )
+            .Table("Arguments")
+            .Row("1. \"blockhash\"", {"required", "string"}, "Block hash to wait for.")
+            .Row("2. timeout", {"int", "optional", "default=0"}, "Time in milliseconds to wait for a response. 0 indicates no timeout.")
+            .Table("Result")
+            .Row("{", {"json object"})
+            .Row("  \"hash\" : {", {"string"}, "The blockhash")
+            .Row("  \"height\" : {", {"int"}, "Block height")
+            .Row("}")
+            .ExampleCli("\"0000000000079f8ef3d2c688c244eb7a4570b24c9ed7b4a8c619eb02596f8862\", 1000")
+            .ExampleRpc("\"0000000000079f8ef3d2c688c244eb7a4570b24c9ed7b4a8c619eb02596f8862\", 1000")
+            .AsError();
+
     int timeout = 0;
 
     uint256 hash(ParseHashV(request.params[0], "blockhash"));
@@ -282,23 +286,25 @@ static UniValue waitforblock(const JSONRPCRequest& request)
 static UniValue waitforblockheight(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
-        throw std::runtime_error(
-            "waitforblockheight <height> (timeout)\n"
-            "\nWaits for (at least) block height and returns the height and hash\n"
-            "of the current tip.\n"
-            "\nReturns the current block on timeout or exit.\n"
-            "\nArguments:\n"
-            "1. height  (required, int) Block height to wait for (int)\n"
-            "2. timeout  (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
-            "\nResult:\n"
-            "{                           (json object)\n"
-            "  \"hash\" : {       (string) The blockhash\n"
-            "  \"height\" : {     (int) Block height\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("waitforblockheight", "\"100\", 1000")
-            + HelpExampleRpc("waitforblockheight", "\"100\", 1000")
-        );
+        throw RPCDoc("waitforblockheight", "<height> (timeout)")
+            .Desc(
+                "Waits for (at least) block height and returns the height and hash\n"
+                "of the current tip.\n"
+                "\n"
+                "Returns the current block on timeout or exit."
+            )
+            .Table("Arguments")
+            .Row("1. height", {"required", "int"}, "Block height to wait for (int)")
+            .Row("2. timeout", {"int", "optional", "default=0"}, "Time in milliseconds to wait for a response. 0 indicates no timeout.")
+            .Table("Result")
+            .Row("{", {"json object"})
+            .Row("  \"hash\" : {", {"string"}, "The blockhash")
+            .Row("  \"height\" : {", {"int"}, "Block height")
+            .Row("}")
+            .ExampleCli("\"100\", 1000")
+            .ExampleRpc("\"100\", 1000")
+            .AsError();
+
     int timeout = 0;
 
     int height = request.params[0].get_int();
@@ -324,13 +330,11 @@ static UniValue waitforblockheight(const JSONRPCRequest& request)
 static UniValue syncwithvalidationinterfacequeue(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 0) {
-        throw std::runtime_error(
-            "syncwithvalidationinterfacequeue\n"
-            "\nWaits for the validation interface queue to catch up on everything that was there when we entered this function.\n"
-            "\nExamples:\n"
-            + HelpExampleCli("syncwithvalidationinterfacequeue","")
-            + HelpExampleRpc("syncwithvalidationinterfacequeue","")
-        );
+        throw RPCDoc("syncwithvalidationinterfacequeue")
+            .Desc("Waits for the validation interface queue to catch up on everything that was there when we entered this function.")
+            .ExampleCli("")
+            .ExampleRpc("")
+            .AsError();
     }
     SyncWithValidationInterfaceQueue();
     return NullUniValue;
@@ -351,33 +355,35 @@ static UniValue getdifficulty(const JSONRPCRequest& request)
     return GetDifficulty(chainActive.Tip());
 }
 
-static std::string EntryDescriptionString()
+static std::vector<RPCDocTableRow> EntryDescription()
 {
-    return "    \"size\" : n,             (numeric) virtual transaction size as defined in BIP 141. This is different from actual serialized size for witness transactions as witness data is discounted.\n"
-           "    \"fee\" : n,              (numeric) transaction fee in " + CURRENCY_UNIT + " (DEPRECATED)\n"
-           "    \"modifiedfee\" : n,      (numeric) transaction fee with fee deltas used for mining priority (DEPRECATED)\n"
-           "    \"time\" : n,             (numeric) local time transaction entered pool in seconds since 1 Jan 1970 GMT\n"
-           "    \"height\" : n,           (numeric) block height when transaction entered pool\n"
-           "    \"descendantcount\" : n,  (numeric) number of in-mempool descendant transactions (including this one)\n"
-           "    \"descendantsize\" : n,   (numeric) virtual transaction size of in-mempool descendants (including this one)\n"
-           "    \"descendantfees\" : n,   (numeric) modified fees (see above) of in-mempool descendants (including this one) (DEPRECATED)\n"
-           "    \"ancestorcount\" : n,    (numeric) number of in-mempool ancestor transactions (including this one)\n"
-           "    \"ancestorsize\" : n,     (numeric) virtual transaction size of in-mempool ancestors (including this one)\n"
-           "    \"ancestorfees\" : n,     (numeric) modified fees (see above) of in-mempool ancestors (including this one) (DEPRECATED)\n"
-           "    \"wtxid\" : hash,         (string) hash of serialized transaction, including witness data\n"
-           "    \"fees\" : {\n"
-           "        \"base\" : n,         (numeric) transaction fee in " + CURRENCY_UNIT + "\n"
-           "        \"modified\" : n,     (numeric) transaction fee with fee deltas used for mining priority in " + CURRENCY_UNIT + "\n"
-           "        \"ancestor\" : n,     (numeric) modified fees (see above) of in-mempool ancestors (including this one) in " + CURRENCY_UNIT + "\n"
-           "        \"descendant\" : n,   (numeric) modified fees (see above) of in-mempool descendants (including this one) in " + CURRENCY_UNIT + "\n"
-           "    }\n"
-           "    \"depends\" : [           (array) unconfirmed transactions used as inputs for this transaction\n"
-           "        \"transactionid\",    (string) parent transaction id\n"
-           "       ... ]\n"
-           "    \"spentby\" : [           (array) unconfirmed transactions spending outputs from this transaction\n"
-           "        \"transactionid\",    (string) child transaction id\n"
-           "       ... ]\n"
-           "    \"bip125-replaceable\" : true|false,  (boolean) Whether this transaction could be replaced due to BIP125 (replace-by-fee)\n";
+    return {
+        RPCDocTableRow("    \"size\" : n,", {"numeric"}, "virtual transaction size as defined in BIP 141. This is different from actual serialized size for witness transactions as witness data is discounted."),
+        RPCDocTableRow("    \"fee\" : n,", {"numeric"}, "transaction fee in " + CURRENCY_UNIT + " (DEPRECATED)"),
+        RPCDocTableRow("    \"modifiedfee\" : n,", {"numeric"}, "transaction fee with fee deltas used for mining priority (DEPRECATED)"),
+        RPCDocTableRow("    \"time\" : n,", {"numeric"}, "local time transaction entered pool in seconds since 1 Jan 1970 GMT"),
+        RPCDocTableRow("    \"height\" : n,", {"numeric"}, "block height when transaction entered pool"),
+        RPCDocTableRow("    \"descendantcount\" : n,", {"numeric"}, "number of in-mempool descendant transactions (including this one)"),
+        RPCDocTableRow("    \"descendantsize\" : n,", {"numeric"}, "virtual transaction size of in-mempool descendants (including this one)"),
+        RPCDocTableRow("    \"descendantfees\" : n,", {"numeric"}, "modified fees (see above) of in-mempool descendants (including this one) (DEPRECATED)"),
+        RPCDocTableRow("    \"ancestorcount\" : n,", {"numeric"}, "number of in-mempool ancestor transactions (including this one)"),
+        RPCDocTableRow("    \"ancestorsize\" : n,", {"numeric"}, "virtual transaction size of in-mempool ancestors (including this one)"),
+        RPCDocTableRow("    \"ancestorfees\" : n,", {"numeric"}, "modified fees (see above) of in-mempool ancestors (including this one) (DEPRECATED)"),
+        RPCDocTableRow("    \"wtxid\" : hash,", {"string"}, "hash of serialized transaction, including witness data"),
+        RPCDocTableRow("    \"fees\" : {"),
+        RPCDocTableRow("        \"base\" : n,", {"numeric"}, "transaction fee in " + CURRENCY_UNIT),
+        RPCDocTableRow("        \"modified\" : n,", {"numeric"}, "transaction fee with fee deltas used for mining priority in " + CURRENCY_UNIT),
+        RPCDocTableRow("        \"ancestor\" : n,", {"numeric"}, "modified fees (see above) of in-mempool ancestors (including this one) in " + CURRENCY_UNIT),
+        RPCDocTableRow("        \"descendant\" : n,", {"numeric"}, "modified fees (see above) of in-mempool descendants (including this one) in " + CURRENCY_UNIT),
+        RPCDocTableRow("    }"),
+        RPCDocTableRow("    \"depends\" : [", {"array"}, "unconfirmed transactions used as inputs for this transaction"),
+        RPCDocTableRow("        \"transactionid\",", {"string"}, "parent transaction id"),
+        RPCDocTableRow("       ... ]"),
+        RPCDocTableRow("    \"spentby\" : [", {"array"}, "unconfirmed transactions spending outputs from this transaction"),
+        RPCDocTableRow("        \"transactionid\",", {"string"}, "child transaction id"),
+        RPCDocTableRow("       ... ]"),
+        RPCDocTableRow("    \"bip125-replaceable\" : true|false,", {"boolean"}, "Whether this transaction could be replaced due to BIP125 (replace-by-fee)")
+    };
 }
 
 static void entryToJSON(UniValue &info, const CTxMemPoolEntry &e) EXCLUSIVE_LOCKS_REQUIRED(::mempool.cs)
@@ -471,27 +477,28 @@ UniValue mempoolToJSON(bool fVerbose)
 static UniValue getrawmempool(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 1)
-        throw std::runtime_error(
-            "getrawmempool ( verbose )\n"
-            "\nReturns all transaction ids in memory pool as a json array of string transaction ids.\n"
-            "\nHint: use getmempoolentry to fetch a specific transaction from the mempool.\n"
-            "\nArguments:\n"
-            "1. verbose  (boolean, optional, default=false) True for a json object, false for array of transaction ids\n"
-            "\nResult: (for verbose = false):\n"
-            "[                     (json array of string)\n"
-            "  \"transactionid\"     (string) The transaction id\n"
-            "  ,...\n"
-            "]\n"
-            "\nResult: (for verbose = true):\n"
-            "{                           (json object)\n"
-            "  \"transactionid\" : {       (json object)\n"
-            + EntryDescriptionString()
-            + "  }, ...\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getrawmempool", "true")
-            + HelpExampleRpc("getrawmempool", "true")
-        );
+        throw RPCDoc("getrawmempool", "( verbose )")
+            .Desc(
+                "Returns all transaction ids in memory pool as a json array of string transaction ids.\n"
+                "\n"
+                "Hint: use getmempoolentry to fetch a specific transaction from the mempool."
+            )
+            .Table("Arguments")
+            .Row("1. verbose", {"boolean", "optional", "default=false"}, "True for a json object, false for array of transaction ids")
+            .Table("Result: (for verbose = false)")
+            .Row("[", {"json array of string"})
+            .Row("  \"transactionid\"", {"string"}, "The transaction id")
+            .Row("  ,...")
+            .Row("]")
+            .Table("Result: (for verbose = true)")
+            .Row("{", {"json object"})
+            .Row("  \"transactionid\" : {", {"json object"})
+            .Rows(EntryDescription())
+            .Row("  }, ...")
+            .Row("}")
+            .ExampleCli("true")
+            .ExampleRpc("true")
+            .AsError();
 
     bool fVerbose = false;
     if (!request.params[0].isNull())
@@ -503,27 +510,25 @@ static UniValue getrawmempool(const JSONRPCRequest& request)
 static UniValue getmempoolancestors(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2) {
-        throw std::runtime_error(
-            "getmempoolancestors txid (verbose)\n"
-            "\nIf txid is in the mempool, returns all in-mempool ancestors.\n"
-            "\nArguments:\n"
-            "1. \"txid\"                 (string, required) The transaction id (must be in mempool)\n"
-            "2. verbose                  (boolean, optional, default=false) True for a json object, false for array of transaction ids\n"
-            "\nResult (for verbose=false):\n"
-            "[                       (json array of strings)\n"
-            "  \"transactionid\"           (string) The transaction id of an in-mempool ancestor transaction\n"
-            "  ,...\n"
-            "]\n"
-            "\nResult (for verbose=true):\n"
-            "{                           (json object)\n"
-            "  \"transactionid\" : {       (json object)\n"
-            + EntryDescriptionString()
-            + "  }, ...\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getmempoolancestors", "\"mytxid\"")
-            + HelpExampleRpc("getmempoolancestors", "\"mytxid\"")
-            );
+        throw RPCDoc("getmempoolancestors", "txid (verbose)")
+            .Desc("If txid is in the mempool, returns all in-mempool ancestors.")
+            .Table("Arguments")
+            .Row("1. \"txid\"", {"string", "required"}, "The transaction id (must be in mempool)")
+            .Row("2. verbose", {"boolean", "optional", "default=false"}, "True for a json object, false for array of transaction ids")
+            .Table("Result (for verbose=false)")
+            .Row("[", {"json array of strings"})
+            .Row("  \"transactionid\"", {"string"}, "The transaction id of an in-mempool ancestor transaction")
+            .Row("  ,...")
+            .Row("]")
+            .Table("Result (for verbose=true)")
+            .Row("{", {"json object"})
+            .Row("  \"transactionid\" : {", {"json object"})
+            .Rows(EntryDescription())
+            .Row("  }, ...")
+            .Row("}")
+            .ExampleCli("\"mytxid\"")
+            .ExampleRpc("\"mytxid\"")
+            .AsError();
     }
 
     bool fVerbose = false;
@@ -567,27 +572,25 @@ static UniValue getmempoolancestors(const JSONRPCRequest& request)
 static UniValue getmempooldescendants(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2) {
-        throw std::runtime_error(
-            "getmempooldescendants txid (verbose)\n"
-            "\nIf txid is in the mempool, returns all in-mempool descendants.\n"
-            "\nArguments:\n"
-            "1. \"txid\"                 (string, required) The transaction id (must be in mempool)\n"
-            "2. verbose                  (boolean, optional, default=false) True for a json object, false for array of transaction ids\n"
-            "\nResult (for verbose=false):\n"
-            "[                       (json array of strings)\n"
-            "  \"transactionid\"           (string) The transaction id of an in-mempool descendant transaction\n"
-            "  ,...\n"
-            "]\n"
-            "\nResult (for verbose=true):\n"
-            "{                           (json object)\n"
-            "  \"transactionid\" : {       (json object)\n"
-            + EntryDescriptionString()
-            + "  }, ...\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getmempooldescendants", "\"mytxid\"")
-            + HelpExampleRpc("getmempooldescendants", "\"mytxid\"")
-            );
+        throw RPCDoc("getmempooldescendants", "txid (verbose)")
+            .Desc("If txid is in the mempool, returns all in-mempool descendants.")
+            .Table("Arguments")
+            .Row("1. \"txid\"", {"string", "required"}, "The transaction id (must be in mempool)")
+            .Row("2. verbose", {"boolean", "optional", "default=false"}, "True for a json object, false for array of transaction ids")
+            .Table("Result (for verbose=false)")
+            .Row("[", {"json array of strings"})
+            .Row("  \"transactionid\"", {"string"}, "The transaction id of an in-mempool descendant transaction")
+            .Row("  ,...")
+            .Row("]")
+            .Table("Result (for verbose=true)")
+            .Row("{", {"json object"})
+            .Row("  \"transactionid\" : {", {"json object"})
+            .Rows(EntryDescription())
+            .Row("  }, ...")
+            .Row("}")
+            .ExampleCli("\"mytxid\"")
+            .ExampleRpc("\"mytxid\"")
+            .AsError();
     }
 
     bool fVerbose = false;
@@ -631,19 +634,17 @@ static UniValue getmempooldescendants(const JSONRPCRequest& request)
 static UniValue getmempoolentry(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1) {
-        throw std::runtime_error(
-            "getmempoolentry txid\n"
-            "\nReturns mempool data for given transaction\n"
-            "\nArguments:\n"
-            "1. \"txid\"                   (string, required) The transaction id (must be in mempool)\n"
-            "\nResult:\n"
-            "{                           (json object)\n"
-            + EntryDescriptionString()
-            + "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getmempoolentry", "\"mytxid\"")
-            + HelpExampleRpc("getmempoolentry", "\"mytxid\"")
-        );
+        throw RPCDoc("getmempoolentry", "txid")
+            .Desc("Returns mempool data for given transaction")
+            .Table("Arguments")
+            .Row("1. \"txid\"", {"string", "required"}, "The transaction id (must be in mempool)")
+            .Table("Result")
+            .Row("{", {"json object"})
+            .Rows(EntryDescription())
+            .Row("}")
+            .ExampleCli("\"mytxid\"")
+            .ExampleRpc("\"mytxid\"")
+            .AsError();
     }
 
     uint256 hash = ParseHashV(request.params[0], "parameter 1");
@@ -917,17 +918,17 @@ static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
 static UniValue pruneblockchain(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "pruneblockchain\n"
-            "\nfoo bar\n"
-            "\nArguments:\n"
-            "1. \"height\"       (numeric, required) The block height to prune up to. May be set to a discrete height, or a unix timestamp\n"
-            "                  to prune blocks whose block time is at least 2 hours older than the provided timestamp.\n"
-            "\nResult:\n"
-            "n    (numeric) Height of the last block pruned.\n"
-            "\nExamples:\n"
-            + HelpExampleCli("pruneblockchain", "1000")
-            + HelpExampleRpc("pruneblockchain", "1000"));
+        throw RPCDoc("pruneblockchain", "")
+            .Table("Arguments")
+            .Row("1. \"height\"", {"numeric", "required"},
+                "The block height to prune up to. May be set to a discrete height, or a unix timestamp\n"
+                "to prune blocks whose block time is at least 2 hours older than the provided timestamp."
+            )
+            .Table("Result")
+            .Row("n", {"numeric"}, "Height of the last block pruned.")
+            .ExampleCli("1000")
+            .ExampleRpc("1000")
+            .AsError();
 
     if (!fPruneMode)
         throw JSONRPCError(RPC_MISC_ERROR, "Cannot prune blocks because node is not in prune mode.");
@@ -967,25 +968,25 @@ static UniValue pruneblockchain(const JSONRPCRequest& request)
 static UniValue gettxoutsetinfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "gettxoutsetinfo\n"
-            "\nReturns statistics about the unspent transaction output set.\n"
-            "Note this call may take some time.\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"height\":n,     (numeric) The current block height (index)\n"
-            "  \"bestblock\": \"hex\",   (string) The hash of the block at the tip of the chain\n"
-            "  \"transactions\": n,      (numeric) The number of transactions with unspent outputs\n"
-            "  \"txouts\": n,            (numeric) The number of unspent transaction outputs\n"
-            "  \"bogosize\": n,          (numeric) A meaningless metric for UTXO set size\n"
-            "  \"hash_serialized_2\": \"hash\",  (string) The serialized hash\n"
-            "  \"disk_size\": n,         (numeric) The estimated size of the chainstate on disk\n"
-            "  \"total_amount\": x.xxx          (numeric) The total amount\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("gettxoutsetinfo", "")
-            + HelpExampleRpc("gettxoutsetinfo", "")
-        );
+        throw RPCDoc("gettxoutsetinfo", "")
+            .Desc(
+                "Returns statistics about the unspent transaction output set.\n"
+                "Note this call may take some time."
+            )
+            .Table("Result")
+            .Row("{")
+            .Row("  \"height\":n,", {"numeric"}, "The current block height (index)")
+            .Row("  \"bestblock\": \"hex\",", {"string"}, "The hash of the block at the tip of the chain")
+            .Row("  \"transactions\": n,", {"numeric"}, "The number of transactions with unspent outputs")
+            .Row("  \"txouts\": n,", {"numeric"}, "The number of unspent transaction outputs")
+            .Row("  \"bogosize\": n,", {"numeric"}, "A meaningless metric for UTXO set size")
+            .Row("  \"hash_serialized_2\": \"hash\",", {"string"}, "The serialized hash")
+            .Row("  \"disk_size\": n,", {"numeric"}, "The estimated size of the chainstate on disk")
+            .Row("  \"total_amount\": x.xxx", {"numeric"}, "The total amount")
+            .Row("}")
+            .ExampleCli("")
+            .ExampleRpc("")
+            .AsError();
 
     UniValue ret(UniValue::VOBJ);
 
@@ -1009,40 +1010,33 @@ static UniValue gettxoutsetinfo(const JSONRPCRequest& request)
 UniValue gettxout(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 3)
-        throw std::runtime_error(
-            "gettxout \"txid\" n ( include_mempool )\n"
-            "\nReturns details about an unspent transaction output.\n"
-            "\nArguments:\n"
-            "1. \"txid\"             (string, required) The transaction id\n"
-            "2. \"n\"                (numeric, required) vout number\n"
-            "3. \"include_mempool\"  (boolean, optional) Whether to include the mempool. Default: true."
-            "     Note that an unspent output that is spent in the mempool won't appear.\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"bestblock\": \"hash\",     (string) The hash of the block at the tip of the chain\n"
-            "  \"confirmations\" : n,       (numeric) The number of confirmations\n"
-            "  \"value\" : x.xxx,           (numeric) The transaction value in " + CURRENCY_UNIT + "\n"
-            "  \"scriptPubKey\" : {         (json object)\n"
-            "     \"asm\" : \"code\",       (string) \n"
-            "     \"hex\" : \"hex\",        (string) \n"
-            "     \"reqSigs\" : n,          (numeric) Number of required signatures\n"
-            "     \"type\" : \"pubkeyhash\",  (string) The type, eg pubkeyhash\n"
-            "     \"addresses\" : [          (array of string) array of bitcoin addresses\n"
-            "        \"address\"     (string) bitcoin address\n"
-            "        ,...\n"
-            "     ]\n"
-            "  },\n"
-            "  \"coinbase\" : true|false   (boolean) Coinbase or not\n"
-            "}\n"
-
-            "\nExamples:\n"
-            "\nGet unspent transactions\n"
-            + HelpExampleCli("listunspent", "") +
-            "\nView the details\n"
-            + HelpExampleCli("gettxout", "\"txid\" 1") +
-            "\nAs a json rpc call\n"
-            + HelpExampleRpc("gettxout", "\"txid\", 1")
-        );
+      throw RPCDoc("gettxout", "\"txid\" n ( include_mempool )")
+            .Desc("Returns details about an unspent transaction output.")
+            .Table("Arguments")
+            .Row("1. \"txid\"", {"string", "required"}, "The transaction id")
+            .Row("2. \"n\"", {"numeric", "required"}, "vout number")
+            .Row("3. \"include_mempool\"", {"boolean", "optional"}, "Whether to include the mempool. Default: true.     Note that an unspent output that is spent in the mempool won't appear.")
+            .Table("Result")
+            .Row("{")
+            .Row("  \"bestblock\": \"hash\",", {"string"}, "The hash of the block at the tip of the chain")
+            .Row("  \"confirmations\" : n,", {"numeric"}, "The number of confirmations")
+            .Row("  \"value\" : x.xxx,", {"numeric"}, "The transaction value in " + CURRENCY_UNIT)
+            .Row("  \"scriptPubKey\" : {", {"json object"})
+            .Row("     \"asm\" : \"code\",", {"string"})
+            .Row("     \"hex\" : \"hex\",", {"string"})
+            .Row("     \"reqSigs\" : n,", {"numeric"}, "Number of required signatures")
+            .Row("     \"type\" : \"pubkeyhash\",", {"string"}, "The type, eg pubkeyhash")
+            .Row("     \"addresses\" : [", {"array of string"}, "array of bitcoin addresses")
+            .Row("        \"address\"", {"string"}, "bitcoin address")
+            .Row("        ,...")
+            .Row("     ]")
+            .Row("  },")
+            .Row("  \"coinbase\" : true|false", {"boolean"}, "Coinbase or not")
+            .Row("}")
+            .ExampleCli("Get unspent transactions", "listunspent", "")
+            .ExampleCli("View the details", "\"txid\" 1")
+            .ExampleRpc("As a json rpc call", "\"txid\" 1")
+            .AsError();
 
     LOCK(cs_main);
 
@@ -1089,18 +1083,16 @@ static UniValue verifychain(const JSONRPCRequest& request)
     int nCheckLevel = gArgs.GetArg("-checklevel", DEFAULT_CHECKLEVEL);
     int nCheckDepth = gArgs.GetArg("-checkblocks", DEFAULT_CHECKBLOCKS);
     if (request.fHelp || request.params.size() > 2)
-        throw std::runtime_error(
-            "verifychain ( checklevel nblocks )\n"
-            "\nVerifies blockchain database.\n"
-            "\nArguments:\n"
-            "1. checklevel   (numeric, optional, 0-4, default=" + strprintf("%d", nCheckLevel) + ") How thorough the block verification is.\n"
-            "2. nblocks      (numeric, optional, default=" + strprintf("%d", nCheckDepth) + ", 0=all) The number of blocks to check.\n"
-            "\nResult:\n"
-            "true|false       (boolean) Verified or not\n"
-            "\nExamples:\n"
-            + HelpExampleCli("verifychain", "")
-            + HelpExampleRpc("verifychain", "")
-        );
+        throw RPCDoc("verifychain", "( checklevel nblocks )")
+            .Desc("Verifies blockchain database.")
+            .Table("Arguments")
+            .Row("1. checklevel", {"numeric", "optional", "0-4", "default=" + strprintf("%d", nCheckLevel)}, "How thorough the block verification is.")
+            .Row("2. nblocks", {"numeric", "optional", "default=" + strprintf("%d", nCheckDepth), "0=all"}, "The number of blocks to check.")
+            .Table("Result")
+            .Row("true|false", {"boolean"}, "Verified or not")
+            .ExampleCli("")
+            .ExampleRpc("")
+            .AsError();
 
     LOCK(cs_main);
 
@@ -1414,22 +1406,20 @@ UniValue mempoolInfoToJSON()
 static UniValue getmempoolinfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getmempoolinfo\n"
-            "\nReturns details on the active state of the TX memory pool.\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"size\": xxxxx,               (numeric) Current tx count\n"
-            "  \"bytes\": xxxxx,              (numeric) Sum of all virtual transaction sizes as defined in BIP 141. Differs from actual serialized size because witness data is discounted\n"
-            "  \"usage\": xxxxx,              (numeric) Total memory usage for the mempool\n"
-            "  \"maxmempool\": xxxxx,         (numeric) Maximum memory usage for the mempool\n"
-            "  \"mempoolminfee\": xxxxx       (numeric) Minimum fee rate in " + CURRENCY_UNIT + "/kB for tx to be accepted. Is the maximum of minrelaytxfee and minimum mempool fee\n"
-            "  \"minrelaytxfee\": xxxxx       (numeric) Current minimum relay fee for transactions\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getmempoolinfo", "")
-            + HelpExampleRpc("getmempoolinfo", "")
-        );
+        throw RPCDoc("getmempoolinfo", "")
+            .Desc("Returns details on the active state of the TX memory pool.")
+            .Table("Result")
+            .Row("{")
+            .Row("  \"size\": xxxxx,", {"numeric"}, "Current tx count")
+            .Row("  \"bytes\": xxxxx,", {"numeric"}, "Sum of all virtual transaction sizes as defined in BIP 141. Differs from actual serialized size because witness data is discounted")
+            .Row("  \"usage\": xxxxx,", {"numeric"}, "Total memory usage for the mempool")
+            .Row("  \"maxmempool\": xxxxx,", {"numeric"}, "Maximum memory usage for the mempool")
+            .Row("  \"mempoolminfee\": xxxxx", {"numeric"}, "Minimum fee rate in " + CURRENCY_UNIT + "/kB for tx to be accepted. Is the maximum of minrelaytxfee and minimum mempool fee")
+            .Row("  \"minrelaytxfee\": xxxxx", {"numeric"}, "Current minimum relay fee for transactions")
+            .Row("}")
+            .ExampleCli("")
+            .ExampleRpc("")
+            .AsError();
 
     return mempoolInfoToJSON();
 }
@@ -1437,17 +1427,19 @@ static UniValue getmempoolinfo(const JSONRPCRequest& request)
 static UniValue preciousblock(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "preciousblock \"blockhash\"\n"
-            "\nTreats a block as if it were received before others with the same work.\n"
-            "\nA later preciousblock call can override the effect of an earlier one.\n"
-            "\nThe effects of preciousblock are not retained across restarts.\n"
-            "\nArguments:\n"
-            "1. \"blockhash\"   (string, required) the hash of the block to mark as precious\n"
-            "\nExamples:\n"
-            + HelpExampleCli("preciousblock", "\"blockhash\"")
-            + HelpExampleRpc("preciousblock", "\"blockhash\"")
-        );
+        throw RPCDoc("preciousblock", "\"blockhash\"")
+            .Desc(
+                "Treats a block as if it were received before others with the same work.\n"
+                "\n"
+                "A later preciousblock call can override the effect of an earlier one.\n"
+                "\n"
+                "The effects of preciousblock are not retained across restarts."
+            )
+            .Table("Arguments")
+            .Row("1. \"blockhash\"", {"string", "required"}, "the hash of the block to mark as precious")
+            .ExampleCli("\"blockhash\"")
+            .ExampleRpc("\"blockhash\"")
+            .AsError();
 
     uint256 hash(ParseHashV(request.params[0], "blockhash"));
     CBlockIndex* pblockindex;
@@ -1473,15 +1465,13 @@ static UniValue preciousblock(const JSONRPCRequest& request)
 static UniValue invalidateblock(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "invalidateblock \"blockhash\"\n"
-            "\nPermanently marks a block as invalid, as if it violated a consensus rule.\n"
-            "\nArguments:\n"
-            "1. \"blockhash\"   (string, required) the hash of the block to mark as invalid\n"
-            "\nExamples:\n"
-            + HelpExampleCli("invalidateblock", "\"blockhash\"")
-            + HelpExampleRpc("invalidateblock", "\"blockhash\"")
-        );
+        throw RPCDoc("invalidateblock", "\"blockhash\"")
+            .Desc("Permanently marks a block as invalid, as if it violated a consensus rule.")
+            .Table("Arguments")
+            .Row("1. \"blockhash\"", {"string", "required"}, "the hash of the block to mark as invalid")
+            .ExampleCli("\"blockhash\"")
+            .ExampleRpc("\"blockhash\"")
+            .AsError();
 
     uint256 hash(ParseHashV(request.params[0], "blockhash"));
     CValidationState state;
@@ -1510,16 +1500,16 @@ static UniValue invalidateblock(const JSONRPCRequest& request)
 static UniValue reconsiderblock(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "reconsiderblock \"blockhash\"\n"
-            "\nRemoves invalidity status of a block and its descendants, reconsider them for activation.\n"
-            "This can be used to undo the effects of invalidateblock.\n"
-            "\nArguments:\n"
-            "1. \"blockhash\"   (string, required) the hash of the block to reconsider\n"
-            "\nExamples:\n"
-            + HelpExampleCli("reconsiderblock", "\"blockhash\"")
-            + HelpExampleRpc("reconsiderblock", "\"blockhash\"")
-        );
+        throw RPCDoc("reconsiderblock", "\"blockhash\"")
+            .Desc(
+                "Removes invalidity status of a block and its descendants, reconsider them for activation.\n"
+                "This can be used to undo the effects of invalidateblock."
+            )
+            .Table("Arguments")
+            .Row("1. \"blockhash\"", {"string", "required"}, "the hash of the block to reconsider")
+            .ExampleCli("\"blockhash\"")
+            .ExampleRpc("\"blockhash\"")
+            .AsError();
 
     uint256 hash(ParseHashV(request.params[0], "blockhash"));
 
@@ -1937,13 +1927,11 @@ static UniValue getblockstats(const JSONRPCRequest& request)
 static UniValue savemempool(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0) {
-        throw std::runtime_error(
-            "savemempool\n"
-            "\nDumps the mempool to disk. It will fail until the previous dump is fully loaded.\n"
-            "\nExamples:\n"
-            + HelpExampleCli("savemempool", "")
-            + HelpExampleRpc("savemempool", "")
-        );
+        throw RPCDoc("savemempool", "")
+            .Desc("Dumps the mempool to disk. It will fail until the previous dump is fully loaded.")
+            .ExampleCli("")
+            .ExampleRpc("")
+            .AsError();
     }
 
     if (!g_is_mempool_loaded) {
@@ -2020,50 +2008,53 @@ public:
 UniValue scantxoutset(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
-        throw std::runtime_error(
-            "scantxoutset <action> ( <scanobjects> )\n"
-            "\nEXPERIMENTAL warning: this call may be removed or changed in future releases.\n"
-            "\nScans the unspent transaction output set for entries that match certain output descriptors.\n"
-            "\nIn the descriptors below, <pubkey> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one\n"
-            "or more path elements separated by `/`, and optionally ending in `/*` (unhardened), or `/*'` or `/*h` (hardened) to specify all\n"
-            "unhardened or hardened child keys.\n"
-            "In the latter case, a range needs to be specified by below if different from 1000.\n"
-            "For more information on output descriptors, see the documentation in the doc/descriptors.md file.\n\n"
-            "Examples of output descriptors:\n"
-            "addr(<address>)                       Outputs whose scriptPubKey corresponds to the specified address (does not include P2PK)\n"
-            "raw(<hex script>)                     Outputs whose scriptPubKey equals the specified hex scripts\n"
-            "combo(<pubkey>)                       P2PK, P2PKH, P2WPKH, and P2SH-P2WPKH outputs for the given pubkey\n"
-            "pkh(<pubkey>)                         P2PKH outputs for the given pubkey\n"
-            "sh(multi(<n>,<pubkey>,<pubkey>,...))  P2SH-multisig outputs for the given threshold and pubkeys\n"
-
-            "\nArguments:\n"
-            "1. \"action\"                       (string, required) The action to execute\n"
-            "                                    - \"start\" for starting a scan\n"
-            "                                    - \"abort\" for aborting the current scan (returns true when abort was successful)\n"
-            "                                    - \"status\" for progress report (in %) of the current scan\n"
-            "2. \"scanobjects\"                  (array, required) Array of scan objects\n"
-            "    [                             Every scan object is either a string descriptor or an object:\n"
-            "        \"descriptor\",             (string, optional) An output descriptor\n"
-            "        {                         (object, optional) An object with output descriptor and metadata\n"
-            "          \"desc\": \"descriptor\",   (string, required) An output descriptor\n"
-            "          \"range\": n,             (numeric, optional) Up to what child index HD chains should be explored (default: 1000)\n"
-            "        },\n"
-            "        ...\n"
-            "    ]\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"unspents\": [\n"
-            "    {\n"
-            "    \"txid\" : \"transactionid\",     (string) The transaction id\n"
-            "    \"vout\": n,                    (numeric) the vout value\n"
-            "    \"scriptPubKey\" : \"script\",    (string) the script key\n"
-            "    \"amount\" : x.xxx,             (numeric) The total amount in " + CURRENCY_UNIT + " of the unspent output\n"
-            "    \"height\" : n,                 (numeric) Height of the unspent transaction output\n"
-            "   }\n"
-            "   ,...], \n"
-            " \"total_amount\" : x.xxx,          (numeric) The total amount of all found unspent outputs in " + CURRENCY_UNIT + "\n"
-            "]\n"
-        );
+        throw RPCDoc("scantxoutset", "<action> ( <scanobjects> )")
+            .Desc(
+                "EXPERIMENTAL warning: this call may be removed or changed in future releases.\n"
+                "\n"
+                "Scans the unspent transaction output set for entries that match certain output descriptors.\n"
+                "\n"
+                "In the desctiptors below, <pubkey> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one\n"
+                "or more path elements separated by `/`, and optionally ending in `/*` (unhardened), or `/*'` or `/*h` (hardened) to specify all\n"
+                "unhardened or hardened child keys.\n"
+                "In the latter case, a range needs to be specified by below if different from 1000.\n"
+                "For more information on output descriptors, see the documentation in the doc/descriptors.md file."
+            )
+            .Table("Examples of output descriptors")
+            .Row("addr(<address>)", "Outputs whose scriptPubKey corresponds to the specified address (does not include P2PK)")
+            .Row("raw(<hex script>)", "Outputs whose scriptPubKey equals the specified hex scripts")
+            .Row("combo(<pubkey>)", "P2PK, P2PKH, P2WPKH, and P2SH-P2WPKH outputs for the given pubkey")
+            .Row("pkh(<pubkey>)", "P2PKH outputs for the given pubkey")
+            .Row("sh(multi(<n>,<pubkey>,<pubkey>,...))", "P2SH-multisig outputs for the given threshold and pubkeys")
+            .Table("Arguments")
+            .Row("1. \"action\"", {"string", "required"},
+                "The action to execute\n"
+                "- \"start\" for starting a scan\n"
+                "- \"abort\" for aborting the current scan (returns true when abort was successful)\n"
+                "- \"status\" for progress report (in %) of the current scan"
+            )
+            .Row("2. \"scanobjects\"", {"array", "required"}, "Array of scan objects")
+            .Row("    [", "Every scan object is either a string descriptor or an object:")
+            .Row("        \"descriptor\",", {"string", "optional"}, "An output descriptor")
+            .Row("        {", {"object", "optional"}, "An object with output descriptor and metadata")
+            .Row("          \"desc\": \"descriptor\",", {"string", "required"}, "An output descriptor")
+            .Row("          \"range\": n,", {"numeric", "optional"}, "Up to what child index HD chains should be explored (default: 1000)")
+            .Row("        },")
+            .Row("        ...")
+            .Row("    ]")
+            .Table("Result")
+            .Row("{")
+            .Row("  \"unspents\": [")
+            .Row("    {")
+            .Row("    \"txid\" : \"transactionid\",", {"string"}, "The transaction id")
+            .Row("    \"vout\": n,", {"numeric"}, "the vout value")
+            .Row("    \"scriptPubKey\" : \"script\",", {"string"}, "the script key")
+            .Row("    \"amount\" : x.xxx,", {"numeric"}, "The total amount in "+CURRENCY_UNIT+" of the unspent output")
+            .Row("    \"height\" : n,", {"numeric"}, "Height of the unspent transaction output")
+            .Row("   }")
+            .Row("   ,...], ")
+            .Row(" \"total_amount\" : x.xxx,", {"numeric"}, "The total amount of all found unspent outputs in " + CURRENCY_UNIT)
+            .AsError();
 
     RPCTypeCheck(request.params, {UniValue::VSTR, UniValue::VARR});
 
