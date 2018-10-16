@@ -167,7 +167,7 @@ static UniValue getblockcount(const JSONRPCRequest& request)
             .Table("Result")
             .Row("n", {"numeric"}, "The current block count")
             .ExampleCli("")
-            .ExampleJson("")
+            .ExampleRpc("")
             .AsError();
 
     LOCK(cs_main);
@@ -182,7 +182,7 @@ static UniValue getbestblockhash(const JSONRPCRequest& request)
             .Table("Result")
             .Row("\"hex\"", {"string"}, "the block hash hex encoded")
             .ExampleCli("")
-            .ExampleJson("")
+            .ExampleRpc("")
             .AsError();
 
     LOCK(cs_main);
@@ -339,15 +339,13 @@ static UniValue syncwithvalidationinterfacequeue(const JSONRPCRequest& request)
 static UniValue getdifficulty(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getdifficulty\n"
-            "\nReturns the proof-of-work difficulty as a multiple of the minimum difficulty.\n"
-            "\nResult:\n"
-            "n.nnn       (numeric) the proof-of-work difficulty as a multiple of the minimum difficulty.\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getdifficulty", "")
-            + HelpExampleRpc("getdifficulty", "")
-        );
+        throw RPCDoc("getdifficulty", "")
+            .Desc("Returns the proof-of-work difficulty as a multiple of the minimum difficulty.")
+            .Table("Result")
+            .Row("n.nnn", {"numeric"}, "the proof-of-work difficulty as a multiple of the minimum difficulty.")
+            .ExampleCli("")
+            .ExampleRpc("")
+            .AsError();
 
     LOCK(cs_main);
     return GetDifficulty(chainActive.Tip());
@@ -673,7 +671,7 @@ static UniValue getblockhash(const JSONRPCRequest& request)
             .Table("Result")
             .Row("\"hash\"", {"string"}, "The block hash")
             .ExampleCli("1000")
-            .ExampleJson("1000")
+            .ExampleRpc("1000")
             .AsError();
 
     LOCK(cs_main);
@@ -717,8 +715,8 @@ static UniValue getblockheader(const JSONRPCRequest& request)
             .Row("}")
             .Table("Result (for verbose=false)")
             .Row("\"data\"", {"string"}, "A string that is serialized, hex-encoded data for block 'hash'.")
-            .ExampleCli("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\""
-            .ExampleJson("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\""
+            .ExampleCli("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
+            .ExampleRpc("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
             .AsError();
 
     LOCK(cs_main);
@@ -811,7 +809,7 @@ static UniValue getblock(const JSONRPCRequest& request)
             .Row("  ,...", "Same output as verbosity = 1.")
             .Row("}")
             .ExampleCli("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
-            .ExampleJson("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
+            .ExampleRpc("\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
             .AsError();
 
 
@@ -1233,7 +1231,7 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
             .Row("  }")
             .Row("  \"warnings\" : \"...\",", {"string"}, "any network and blockchain warnings.")
             .ExampleCli("")
-            .ExampleJson("")
+            .ExampleRpc("")
             .AsError();
 
     LOCK(cs_main);
@@ -1302,35 +1300,32 @@ struct CompareBlocksByHeight
 static UniValue getchaintips(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getchaintips\n"
-            "Return information about all known tips in the block tree,"
-            " including the main chain as well as orphaned branches.\n"
-            "\nResult:\n"
-            "[\n"
-            "  {\n"
-            "    \"height\": xxxx,         (numeric) height of the chain tip\n"
-            "    \"hash\": \"xxxx\",         (string) block hash of the tip\n"
-            "    \"branchlen\": 0          (numeric) zero for main chain\n"
-            "    \"status\": \"active\"      (string) \"active\" for the main chain\n"
-            "  },\n"
-            "  {\n"
-            "    \"height\": xxxx,\n"
-            "    \"hash\": \"xxxx\",\n"
-            "    \"branchlen\": 1          (numeric) length of branch connecting the tip to the main chain\n"
-            "    \"status\": \"xxxx\"        (string) status of the chain (active, valid-fork, valid-headers, headers-only, invalid)\n"
-            "  }\n"
-            "]\n\n"
-            "Possible values for status:\n"
-            "1. \"invalid\"               This branch contains at least one invalid block\n"
-            "2. \"headers-only\"          Not all blocks for this branch are available, but the headers are valid\n"
-            "3. \"valid-headers\"         All blocks are available for this branch, but they were never fully validated\n"
-            "4. \"valid-fork\"            This branch is not part of the active chain, but is fully validated\n"
-            "5. \"active\"                This is the tip of the active main chain, which is certainly valid\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getchaintips", "")
-            + HelpExampleRpc("getchaintips", "")
-        );
+        throw RPCDoc("getchaintips", "")
+            .Desc("Return information about all known tips in the block tree, including the main chain as well as orphaned branches.")
+            .Table("Result")
+            .Row("[")
+            .Row("  {")
+            .Row("    \"height\": xxxx,", {"numeric"}, "height of the chain tip")
+            .Row("    \"hash\": \"xxxx\",", {"string"}, "block hash of the tip")
+            .Row("    \"branchlen\": 0", {"numeric"}, "zero for main chain")
+            .Row("    \"status\": \"active\"", {"string"}, "\"active\" for the main chain")
+            .Row("  },")
+            .Row("  {")
+            .Row("    \"height\": xxxx,")
+            .Row("    \"hash\": \"xxxx\",")
+            .Row("    \"branchlen\": 1", {"numeric"}, "length of branch connecting the tip to the main chain")
+            .Row("    \"status\": \"xxxx\"", {"string"}, "status of the chain (active, valid-fork, valid-headers, headers-only, invalid)")
+            .Row("  }")
+            .Row("]")
+            .Table("Possible values for status")
+            .Row("1. \"invalid\"", "This branch contains at least one invalid block")
+            .Row("2. \"headers-only\"", "Not all blocks for this branch are available, but the headers are valid")
+            .Row("3. \"valid-headers\"", "All blocks are available for this branch, but they were never fully validated")
+            .Row("4. \"valid-fork\"", "This branch is not part of the active chain, but is fully validated")
+            .Row("5. \"active\"", "This is the tip of the active main chain, which is certainly valid")
+            .ExampleCli("")
+            .ExampleRpc("")
+            .AsError();
 
     LOCK(cs_main);
 
@@ -1551,26 +1546,24 @@ static UniValue reconsiderblock(const JSONRPCRequest& request)
 static UniValue getchaintxstats(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 2)
-        throw std::runtime_error(
-            "getchaintxstats ( nblocks blockhash )\n"
-            "\nCompute statistics about the total number and rate of transactions in the chain.\n"
-            "\nArguments:\n"
-            "1. nblocks      (numeric, optional) Size of the window in number of blocks (default: one month).\n"
-            "2. \"blockhash\"  (string, optional) The hash of the block that ends the window.\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"time\": xxxxx,                         (numeric) The timestamp for the final block in the window in UNIX format.\n"
-            "  \"txcount\": xxxxx,                      (numeric) The total number of transactions in the chain up to that point.\n"
-            "  \"window_final_block_hash\": \"...\",      (string) The hash of the final block in the window.\n"
-            "  \"window_block_count\": xxxxx,           (numeric) Size of the window in number of blocks.\n"
-            "  \"window_tx_count\": xxxxx,              (numeric) The number of transactions in the window. Only returned if \"window_block_count\" is > 0.\n"
-            "  \"window_interval\": xxxxx,              (numeric) The elapsed time in the window in seconds. Only returned if \"window_block_count\" is > 0.\n"
-            "  \"txrate\": x.xx,                        (numeric) The average rate of transactions per second in the window. Only returned if \"window_interval\" is > 0.\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getchaintxstats", "")
-            + HelpExampleRpc("getchaintxstats", "2016")
-        );
+        throw RPCDoc("getchaintxstats", "( nblocks blockhash )")
+            .Desc("Compute statistics about the total number and rate of transactions in the chain.")
+            .Table("Arguments")
+            .Row("1. nblocks", {"numeric", "optional"}, "Size of the window in number of blocks (default: one month).")
+            .Row("2. \"blockhash\"", {"string", "optional"}, "The hash of the block that ends the window.")
+            .Table("Result")
+            .Row("{")
+            .Row("  \"time\": xxxxx,", {"numeric"}, "The timestamp for the final block in the window in UNIX format.")
+            .Row("  \"txcount\": xxxxx,", {"numeric"}, "The total number of transactions in the chain up to that point.")
+            .Row("  \"window_final_block_hash\": \"...\",", {"string"}, "The hash of the final block in the window.")
+            .Row("  \"window_block_count\": xxxxx,", {"numeric"}, "Size of the window in number of blocks.")
+            .Row("  \"window_tx_count\": xxxxx,", {"numeric"}, "The number of transactions in the window. Only returned if \"window_block_count\" is > 0.")
+            .Row("  \"window_interval\": xxxxx,", {"numeric"}, "The elapsed time in the window in seconds. Only returned if \"window_block_count\" is > 0.")
+            .Row("  \"txrate\": x.xx,", {"numeric"}, "The average rate of transactions per second in the window. Only returned if \"window_interval\" is > 0.")
+            .Row("}")
+            .ExampleCli("")
+            .ExampleRpc("2016")
+            .AsError();
 
     const CBlockIndex* pindex;
     int blockcount = 30 * 24 * 60 * 60 / Params().GetConsensus().nPowTargetSpacing; // By default: 1 month
@@ -1733,7 +1726,7 @@ static UniValue getblockstats(const JSONRPCRequest& request)
             .Row("  \"utxo_size_inc\": xxxxx,", {"numeric"}, "The increase/decrease in size for the utxo index (not discounting op_return and similar)")
             .Row("}")
             .ExampleCli("1000 '[\"minfeerate\",\"avgfeerate\"]'")
-            .ExampleJson("1000 '[\"minfeerate\",\"avgfeerate\"]'")
+            .ExampleRpc("1000 '[\"minfeerate\",\"avgfeerate\"]'")
             .AsError();
     }
 

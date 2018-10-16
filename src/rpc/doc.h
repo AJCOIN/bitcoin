@@ -78,7 +78,7 @@ public:
     RPCDoc& Example(const std::string& description, const std::string& code);
 
     RPCDoc& ExampleCli(const std::string& args);
-    RPCDoc& ExampleJson(const std::string& args);
+    RPCDoc& ExampleRpc(const std::string& args);
 
     std::string AsText() const;
     std::runtime_error AsError() const;

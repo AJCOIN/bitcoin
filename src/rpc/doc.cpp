@@ -192,7 +192,7 @@ RPCDoc& RPCDoc::ExampleCli(const std::string& args)
     return *this;
 }
 
-RPCDoc& RPCDoc::ExampleJson(const std::string& args)
+RPCDoc& RPCDoc::ExampleRpc(const std::string& args)
 {
     m_examples.push_back(RPCDocExample(
         "curl --user myusername --data-binary '{\"jsonrpc\": \"1.0\", \"id\":\"curltest\", "
