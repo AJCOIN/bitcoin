@@ -210,7 +210,7 @@ static UniValue waitfornewblock(const JSONRPCRequest& request)
             "\nWaits for a specific new block and returns useful info about it.\n"
             "\nReturns the current block on timeout or exit.\n"
             "\nArguments:\n"
-            "1. timeout (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
+            "1. timeout  (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
             "\nResult:\n"
             "{                           (json object)\n"
             "  \"hash\" : {       (string) The blockhash\n"
@@ -248,8 +248,8 @@ static UniValue waitforblock(const JSONRPCRequest& request)
             "\nWaits for a specific new block and returns useful info about it.\n"
             "\nReturns the current block on timeout or exit.\n"
             "\nArguments:\n"
-            "1. \"blockhash\" (required, string) Block hash to wait for.\n"
-            "2. timeout       (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
+            "1. \"blockhash\"  (required, string) Block hash to wait for.\n"
+            "2. timeout        (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
             "\nResult:\n"
             "{                           (json object)\n"
             "  \"hash\" : {       (string) The blockhash\n"
@@ -292,7 +292,7 @@ static UniValue waitforblockheight(const JSONRPCRequest& request)
             "\nReturns the current block on timeout or exit.\n"
             "\nArguments:\n"
             "1. height  (required, int) Block height to wait for (int)\n"
-            "2. timeout (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
+            "2. timeout  (int, optional, default=0) Time in milliseconds to wait for a response. 0 indicates no timeout.\n"
             "\nResult:\n"
             "{                           (json object)\n"
             "  \"hash\" : {       (string) The blockhash\n"
@@ -926,6 +926,7 @@ static UniValue pruneblockchain(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
             "pruneblockchain\n"
+            "\nfoo bar\n"
             "\nArguments:\n"
             "1. \"height\"       (numeric, required) The block height to prune up to. May be set to a discrete height, or a unix timestamp\n"
             "                  to prune blocks whose block time is at least 2 hours older than the provided timestamp.\n"
@@ -1329,11 +1330,11 @@ static UniValue getchaintips(const JSONRPCRequest& request)
             "  }\n"
             "]\n\n"
             "Possible values for status:\n"
-            "1.  \"invalid\"               This branch contains at least one invalid block\n"
-            "2.  \"headers-only\"          Not all blocks for this branch are available, but the headers are valid\n"
-            "3.  \"valid-headers\"         All blocks are available for this branch, but they were never fully validated\n"
-            "4.  \"valid-fork\"            This branch is not part of the active chain, but is fully validated\n"
-            "5.  \"active\"                This is the tip of the active main chain, which is certainly valid\n"
+            "1. \"invalid\"               This branch contains at least one invalid block\n"
+            "2. \"headers-only\"          Not all blocks for this branch are available, but the headers are valid\n"
+            "3. \"valid-headers\"         All blocks are available for this branch, but they were never fully validated\n"
+            "4. \"valid-fork\"            This branch is not part of the active chain, but is fully validated\n"
+            "5. \"active\"                This is the tip of the active main chain, which is certainly valid\n"
             "\nExamples:\n"
             + HelpExampleCli("getchaintips", "")
             + HelpExampleRpc("getchaintips", "")
@@ -1490,7 +1491,6 @@ static UniValue invalidateblock(const JSONRPCRequest& request)
             "\nPermanently marks a block as invalid, as if it violated a consensus rule.\n"
             "\nArguments:\n"
             "1. \"blockhash\"   (string, required) the hash of the block to mark as invalid\n"
-            "\nResult:\n"
             "\nExamples:\n"
             + HelpExampleCli("invalidateblock", "\"blockhash\"")
             + HelpExampleRpc("invalidateblock", "\"blockhash\"")
@@ -1529,7 +1529,6 @@ static UniValue reconsiderblock(const JSONRPCRequest& request)
             "This can be used to undo the effects of invalidateblock.\n"
             "\nArguments:\n"
             "1. \"blockhash\"   (string, required) the hash of the block to reconsider\n"
-            "\nResult:\n"
             "\nExamples:\n"
             + HelpExampleCli("reconsiderblock", "\"blockhash\"")
             + HelpExampleRpc("reconsiderblock", "\"blockhash\"")

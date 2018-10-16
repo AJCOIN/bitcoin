@@ -241,7 +241,8 @@ static UniValue setmocktime(const JSONRPCRequest& request)
             "\nSet the local time to given timestamp (-regtest only)\n"
             "\nArguments:\n"
             "1. timestamp  (integer, required) Unix seconds-since-epoch timestamp\n"
-            "   Pass 0 to go back to using the system time."
+            "\n\n"
+            "              Pass 0 to go back to using the system time."
         );
 
     if (!Params().MineBlocksOnDemand())

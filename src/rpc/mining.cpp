@@ -869,8 +869,9 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
             "\nEstimates the approximate fee per kilobyte needed for a transaction to begin\n"
             "confirmation within conf_target blocks if possible. Uses virtual transaction size as\n"
             "defined in BIP 141 (witness data is discounted).\n"
+            "\n\nResults are returned for any horizon which tracks blocks up to the confirmation target.\n"
             "\nArguments:\n"
-            "1. conf_target (numeric) Confirmation target in blocks (1 - 1008)\n"
+            "1. conf_target  (numeric) Confirmation target in blocks (1 - 1008)\n"
             "2. threshold   (numeric, optional) The proportion of transactions in a given feerate range that must have been\n"
             "               confirmed within conf_target in order to consider those feerates as high enough and proceed to check\n"
             "               lower buckets.  Default: 0.95\n"
@@ -884,7 +885,7 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
             "          \"startrange\" : x.x,     (numeric) start of feerate range\n"
             "          \"endrange\" : x.x,       (numeric) end of feerate range\n"
             "          \"withintarget\" : x.x,   (numeric) number of txs over history horizon in the feerate range that were confirmed within target\n"
-            "          \"totalconfirmed\" : x.x, (numeric) number of txs over history horizon in the feerate range that were confirmed at any point\n"
+            "          \"totalconfirmed\" : x.x,  (numeric) number of txs over history horizon in the feerate range that were confirmed at any point\n"
             "          \"inmempool\" : x.x,      (numeric) current number of txs in mempool in the feerate range unconfirmed for at least target blocks\n"
             "          \"leftmempool\" : x.x,    (numeric) number of txs over history horizon in the feerate range that left mempool unconfirmed after target\n"
             "      },\n"
@@ -895,7 +896,6 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
             "  \"long\" : { ... }       (json object) estimate for long time horizon\n"
             "}\n"
             "\n"
-            "Results are returned for any horizon which tracks blocks up to the confirmation target.\n"
             "\nExamples:\n"
             + HelpExampleCli("estimaterawfee", "6 0.9")
             );
