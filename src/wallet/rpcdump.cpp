@@ -3,17 +3,18 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <chain.h>
+#include <core_io.h>
 #include <key_io.h>
+#include <merkleblock.h>
 #include <rpc/server.h>
-#include <validation.h>
+#include <rpc/util.h>
 #include <script/script.h>
 #include <script/standard.h>
 #include <sync.h>
 #include <util.h>
 #include <utiltime.h>
+#include <validation.h>
 #include <wallet/wallet.h>
-#include <merkleblock.h>
-#include <core_io.h>
 
 #include <wallet/rpcwallet.h>
 

@@ -9,10 +9,8 @@
 #include <consensus/validation.h>
 #include <core_io.h>
 #include <index/txindex.h>
-#include <keystore.h>
-#include <validation.h>
-#include <validationinterface.h>
 #include <key_io.h>
+#include <keystore.h>
 #include <merkleblock.h>
 #include <net.h>
 #include <policy/policy.h>
@@ -20,6 +18,7 @@
 #include <primitives/transaction.h>
 #include <rpc/rawtransaction.h>
 #include <rpc/server.h>
+#include <rpc/util.h>
 #include <script/script.h>
 #include <script/script_error.h>
 #include <script/sign.h>
@@ -27,6 +26,8 @@
 #include <txmempool.h>
 #include <uint256.h>
 #include <utilstrencodings.h>
+#include <validation.h>
+#include <validationinterface.h>
 
 #include <future>
 #include <stdint.h>
@@ -204,7 +205,16 @@ static UniValue gettxoutproof(const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() != 1 && request.params.size() != 2))
         throw std::runtime_error(
-            "gettxoutproof [\"txid\",...] ( blockhash )\n"
+            RPCHelpMan{"gettxoutproof",
+                {
+                    RPCArg{"txids", RPCArg::Type::ARR,
+                        {
+                            RPCArg{"txid", RPCArg::Type::STR, false},
+                        },
+                        false},
+                    RPCArg{"blockhash", RPCArg::Type::STR, true},
+                }}
+                .ToString() +
             "\nReturns a hex-encoded proof that \"txid\" was included in a block.\n"
             "\nNOTE: By default this function only works sometimes. This is when there is an\n"
             "unspent output in the utxo for this transaction. To make it always work,\n"
@@ -674,7 +684,15 @@ static UniValue combinerawtransaction(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
-            "combinerawtransaction [\"hexstring\",...]\n"
+            RPCHelpMan{"combinerawtransaction",
+                {
+                    RPCArg{"txs", RPCArg::Type::ARR,
+                        {
+                            RPCArg{"hexstring", RPCArg::Type::STR, false},
+                        },
+                        false},
+                }}
+                .ToString() +
             "\nCombine multiple partially signed transactions into one transaction.\n"
             "The combined transaction may be another partially signed transaction or a \n"
             "fully signed transaction."
@@ -897,7 +915,30 @@ static UniValue signrawtransactionwithkey(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
         throw std::runtime_error(
-            "signrawtransactionwithkey \"hexstring\" [\"privatekey1\",...] ( [{\"txid\":\"id\",\"vout\":n,\"scriptPubKey\":\"hex\",\"redeemScript\":\"hex\"},...] sighashtype )\n"
+            RPCHelpMan{"signrawtransactionwithkey",
+                {
+                    RPCArg{"hexstring", RPCArg::Type::STR, false},
+                    RPCArg{"privkyes", RPCArg::Type::ARR,
+                        {
+                            RPCArg{"privatekey", RPCArg::Type::STR, false},
+                        },
+                        false},
+                    RPCArg{"prevtxs", RPCArg::Type::ARR,
+                        {
+                            RPCArg{"", RPCArg::Type::OBJ,
+                                {
+                                    RPCArg{"txid", RPCArg::Type::STR, false},
+                                    RPCArg{"vout", RPCArg::Type::NUM, false},
+                                    RPCArg{"scriptPubKey", RPCArg::Type::STR, false},
+                                    RPCArg{"redeemScript", RPCArg::Type::STR, false},
+                                    RPCArg{"amount", RPCArg::Type::AMOUNT, false},
+                                },
+                                true},
+                        },
+                        true},
+                    RPCArg{"sighashtype", RPCArg::Type::STR, true},
+                }}
+                .ToString() +
             "\nSign inputs for raw transaction (serialized, hex-encoded).\n"
             "The second argument is an array of base58-encoded private\n"
             "keys that will be the only keys used to sign the transaction.\n"
@@ -1452,7 +1493,15 @@ UniValue combinepsbt(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
-            "combinepsbt [\"psbt\",...]\n"
+            RPCHelpMan{"combinepsbt",
+                {
+                    RPCArg{"txs", RPCArg::Type::ARR,
+                        {
+                            RPCArg{"psbt", RPCArg::Type::STR, false},
+                        },
+                        false},
+                }}
+                .ToString() +
             "\nCombine multiple partially signed Bitcoin transactions into one transaction.\n"
             "Implements the Combiner role.\n"
             "\nArguments:\n"
@@ -1568,7 +1617,37 @@ UniValue createpsbt(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
         throw std::runtime_error(
-                            "createpsbt [{\"txid\":\"id\",\"vout\":n},...] [{\"address\":amount},{\"data\":\"hex\"},...] ( locktime ) ( replaceable )\n"
+            RPCHelpMan{"createpsbt",
+                {
+                    RPCArg{"inputs", RPCArg::Type::ARR,
+                        {
+                            RPCArg{"", RPCArg::Type::OBJ,
+                                {
+                                    RPCArg{"txid", RPCArg::Type::STR, false},
+                                    RPCArg{"vout", RPCArg::Type::NUM, false},
+                                    RPCArg{"sequence", RPCArg::Type::NUM, true},
+                                },
+                                false},
+                        },
+                        false},
+                    RPCArg{"outputs", RPCArg::Type::ARR,
+                        {
+                            RPCArg{"", RPCArg::Type::OBJ,
+                                {
+                                    RPCArg{"address", RPCArg::Type::AMOUNT, false},
+                                },
+                                true},
+                            RPCArg{"", RPCArg::Type::OBJ,
+                                {
+                                    RPCArg{"data", RPCArg::Type::STR_HEX, false},
+                                },
+                                true},
+                        },
+                        false},
+                    RPCArg{"locktime", RPCArg::Type::NUM, true},
+                    RPCArg{"replacable", RPCArg::Type::BOOL, true},
+                }}
+                .ToString() +
                             "\nCreates a transaction in the Partially Signed Transaction format.\n"
                             "Implements the Creator role.\n"
                             "\nArguments:\n"
