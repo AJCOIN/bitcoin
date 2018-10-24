@@ -24,6 +24,38 @@ CScript CreateMultisigRedeemscript(const int required, const std::vector<CPubKey
 
 UniValue DescribeAddress(const CTxDestination& dest);
 
+class RPCHelpTableRow
+{
+private:
+    const std::string m_left;
+    const std::string m_right;
+
+public:
+    explicit RPCHelpTableRow(const std::string& left, const std::string& right) : m_left(left), m_right(right)
+    {
+    }
+
+    std::vector<std::string> RightLines() const;
+    std::string const& Left() const;
+};
+
+class RPCHelpTable
+{
+private:
+    std::string m_name;
+    std::vector<RPCHelpTableRow> m_rows;
+
+    size_t PrefixLength() const;
+
+public:
+    explicit RPCHelpTable(const std::string& name) : m_name(name) {}
+
+    void AddRow(const RPCHelpTableRow& row);
+
+    std::string AsText() const;
+};
+
+
 struct RPCArg {
     enum class Type {
         OBJ,

@@ -9,6 +9,9 @@
 #include <tinyformat.h>
 #include <utilstrencodings.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
+
 #define FIRSTLINE_MAX_ARG_LENGTH 100
 
 // Converts a hex string to a public key if possible
@@ -127,6 +130,63 @@ public:
 UniValue DescribeAddress(const CTxDestination& dest)
 {
     return boost::apply_visitor(DescribeAddressVisitor(), dest);
+}
+
+std::vector<std::string> RPCHelpTableRow::RightLines() const
+{
+    std::vector<std::string> res;
+    boost::split(res, m_right, boost::is_any_of("\n"));
+    return res;
+}
+
+std::string const& RPCHelpTableRow::Left() const
+{
+    return m_left;
+}
+
+size_t RPCHelpTable::PrefixLength() const
+{
+    size_t max = 0;
+    for (const auto& row : m_rows) {
+        size_t prefix = row.Left().length() + 2;
+        if (prefix > max) {
+            max = prefix;
+        }
+    }
+    return max;
+}
+
+void RPCHelpTable::AddRow(const RPCHelpTableRow& row)
+{
+    m_rows.emplace_back(row);
+}
+
+std::string RPCHelpTable::AsText() const
+{
+    std::string res;
+    res += m_name;
+    res += ":\n";
+
+    size_t prefixLen = PrefixLength();
+    for (const auto& row : m_rows) {
+        const std::string& left = row.Left();
+        res += left;
+        auto lines = row.RightLines();
+        bool firstLine = true;
+        for (const auto& line : lines) {
+            size_t spaces;
+            if (firstLine) {
+                spaces = prefixLen - left.length();
+            } else {
+                spaces = prefixLen;
+            }
+            res += std::string(spaces, ' ');
+            res += line;
+            res += "\n";
+            firstLine = false;
+        }
+    }
+    return res;
 }
 
 std::string RPCHelpMan::ToString() const
