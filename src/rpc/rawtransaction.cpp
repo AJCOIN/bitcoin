@@ -213,22 +213,15 @@ static UniValue gettxoutproof(const JSONRPCRequest& request)
                 "you need to maintain a transaction index, using the -txindex command line option or\n"
                 "specify the block in which the transaction is included manually (by blockhash).",
                 {
-                    RPCArg{"txids", RPCArg::Type::ARR,
+                    RPCArg{"txids", "A json array of txids to filter", RPCArg::Type::ARR,
                         {
-                            RPCArg{"txid", RPCArg::Type::STR, false},
+                            RPCArg{"txid", "A transaction hash", RPCArg::Type::STR, false},
                         },
                         false},
-                    RPCArg{"blockhash", RPCArg::Type::STR, true},
+                    RPCArg{"blockhash", "If specified, looks for txid in the block with this hash", RPCArg::Type::STR, true},
                 }}
                 .ToString() +
-
-            "\nArguments:\n"
-            "1. \"txids\"       (string) A json array of txids to filter\n"
-            "    [\n"
-            "      \"txid\"     (string) A transaction hash\n"
-            "      ,...\n"
-            "    ]\n"
-            "2. \"blockhash\"   (string, optional) If specified, looks for txid in the block with this hash\n"
+            "\n"
             "\nResult:\n"
             "\"data\"           (string) A string that is a serialized, hex-encoded data for the proof.\n"
         );
@@ -691,22 +684,13 @@ static UniValue combinerawtransaction(const JSONRPCRequest& request)
                 "The combined transaction may be another partially signed transaction or a \n"
                 "fully signed transaction.",
                 {
-                    RPCArg{"txs", RPCArg::Type::ARR,
+                    RPCArg{"txs", "A json array of hex strings of partially signed transactions", RPCArg::Type::ARR,
                         {
-                            RPCArg{"hexstring", RPCArg::Type::STR, false},
+                            RPCArg{"hexstring", "A transaction hash", RPCArg::Type::STR, false},
                         },
                         false},
                 }}
                 .ToString() +
-
-
-            "\nArguments:\n"
-            "1. \"txs\"         (string) A json array of hex strings of partially signed transactions\n"
-            "    [\n"
-            "      \"hexstring\"     (string) A transaction hash\n"
-            "      ,...\n"
-            "    ]\n"
-
             "\nResult:\n"
             "\"hex\"            (string) The hex-encoded raw transaction with signature(s)\n"
 
@@ -925,54 +909,35 @@ static UniValue signrawtransactionwithkey(const JSONRPCRequest& request)
                 "The third optional argument (may be null) is an array of previous transaction outputs that\n"
                 "this transaction depends on but may not yet be in the block chain.",
                 {
-                    RPCArg{"hexstring", RPCArg::Type::STR, false},
-                    RPCArg{"privkyes", RPCArg::Type::ARR,
+                    RPCArg{"hexstring", "The transaction hex string", RPCArg::Type::STR, false},
+                    RPCArg{"privkeys", "A json array of base58-encoded private keys for signing", RPCArg::Type::ARR,
                         {
-                            RPCArg{"privatekey", RPCArg::Type::STR, false},
+                            RPCArg{"privatekey", "private key in base58-encoding", RPCArg::Type::STR, false},
                         },
                         false},
-                    RPCArg{"prevtxs", RPCArg::Type::ARR,
+                    RPCArg{"prevtxs", "An json array of previous dependent transaction outputs, or 'null'", RPCArg::Type::ARR,
                         {
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"txid", RPCArg::Type::STR, false},
-                                    RPCArg{"vout", RPCArg::Type::NUM, false},
-                                    RPCArg{"scriptPubKey", RPCArg::Type::STR, false},
-                                    RPCArg{"redeemScript", RPCArg::Type::STR, false},
-                                    RPCArg{"amount", RPCArg::Type::AMOUNT, false},
+                                    RPCArg{"txid", "The transaction id", RPCArg::Type::STR, false},
+                                    RPCArg{"vout", "The output number", RPCArg::Type::NUM, false},
+                                    RPCArg{"scriptPubKey", "script key", RPCArg::Type::STR, false},
+                                    RPCArg{"redeemScript", "redeem script, required for P2SH or P2WSH", RPCArg::Type::STR, false},
+                                    RPCArg{"amount", "The amount spent", RPCArg::Type::AMOUNT, false},
                                 },
                                 true},
                         },
                         true},
-                    RPCArg{"sighashtype", RPCArg::Type::STR, true},
+                    RPCArg{"sighashtype", "The signature hash type. Must be one of:\n"
+                                          "- \"ALL\"\n"
+                                          "- \"NONE\"\n"
+                                          "- \"SINGLE\"\n"
+                                          "- \"ALL|ANYONECANPAY\"\n"
+                                          "- \"NONE|ANYONECANPAY\"\n"
+                                          "- \"SINGLE|ANYONECANPAY\"\n",
+                        RPCArg::Type::STR, true},
                 }}
                 .ToString() +
-            "\nArguments:\n"
-            "1. \"hexstring\"                      (string, required) The transaction hex string\n"
-            "2. \"privkeys\"                       (string, required) A json array of base58-encoded private keys for signing\n"
-            "    [                               (json array of strings)\n"
-            "      \"privatekey\"                  (string) private key in base58-encoding\n"
-            "      ,...\n"
-            "    ]\n"
-            "3. \"prevtxs\"                        (string, optional) An json array of previous dependent transaction outputs\n"
-            "     [                              (json array of json objects, or 'null' if none provided)\n"
-            "       {\n"
-            "         \"txid\":\"id\",               (string, required) The transaction id\n"
-            "         \"vout\":n,                  (numeric, required) The output number\n"
-            "         \"scriptPubKey\": \"hex\",     (string, required) script key\n"
-            "         \"redeemScript\": \"hex\",     (string, required for P2SH or P2WSH) redeem script\n"
-            "         \"amount\": value            (numeric, required) The amount spent\n"
-            "       }\n"
-            "       ,...\n"
-            "    ]\n"
-            "4. \"sighashtype\"                    (string, optional, default=ALL) The signature hash type. Must be one of:\n"
-            "       \"ALL\"\n"
-            "       \"NONE\"\n"
-            "       \"SINGLE\"\n"
-            "       \"ALL|ANYONECANPAY\"\n"
-            "       \"NONE|ANYONECANPAY\"\n"
-            "       \"SINGLE|ANYONECANPAY\"\n"
-
             "\nResult:\n"
             "{\n"
             "  \"hex\" : \"value\",                  (string) The hex-encoded raw transaction with signature(s)\n"
@@ -1499,19 +1464,13 @@ UniValue combinepsbt(const JSONRPCRequest& request)
                 "Combine multiple partially signed Bitcoin transactions into one transaction.\n"
                 "Implements the Combiner role.",
                 {
-                    RPCArg{"txs", RPCArg::Type::ARR,
+                    RPCArg{"txs", "A json array of base64 strings of partially signed transactions", RPCArg::Type::ARR,
                         {
-                            RPCArg{"psbt", RPCArg::Type::STR, false},
+                            RPCArg{"psbt", "A base64 string of a PSBT", RPCArg::Type::STR, false},
                         },
                         false},
                 }}
                 .ToString() +
-            "\nArguments:\n"
-            "1. \"txs\"                   (string) A json array of base64 strings of partially signed transactions\n"
-            "    [\n"
-            "      \"psbt\"             (string) A base64 string of a PSBT\n"
-            "      ,...\n"
-            "    ]\n"
 
             "\nResult:\n"
             "  \"psbt\"          (string) The base64-encoded partially signed transaction\n"
@@ -1623,59 +1582,37 @@ UniValue createpsbt(const JSONRPCRequest& request)
                 "Creates a transaction in the Partially Signed Transaction format.\n"
                 "Implements the Creator role.",
                 {
-                    RPCArg{"inputs", RPCArg::Type::ARR,
+                    RPCArg{"inputs", "A json array of json objects", RPCArg::Type::ARR,
                         {
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"txid", RPCArg::Type::STR, false},
-                                    RPCArg{"vout", RPCArg::Type::NUM, false},
-                                    RPCArg{"sequence", RPCArg::Type::NUM, true},
+                                    RPCArg{"txid", "The transaction ID", RPCArg::Type::STR, false},
+                                    RPCArg{"vout", "The output number", RPCArg::Type::NUM, false},
+                                    RPCArg{"sequence", "The sequence number", RPCArg::Type::NUM, true},
                                 },
                                 false},
                         },
                         false},
-                    RPCArg{"outputs", RPCArg::Type::ARR,
+                    RPCArg{"outputs", "A json array with outputs (key-value pairs)", RPCArg::Type::ARR,
                         {
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"address", RPCArg::Type::AMOUNT, false},
+                                    RPCArg{"address", "A key-value pair. The key (string) is the bitcoin address, the value (float or string) is the amount in " + CURRENCY_UNIT, RPCArg::Type::AMOUNT, false},
                                 },
                                 true},
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"data", RPCArg::Type::STR_HEX, false},
+                                    RPCArg{"data", "A key-value pair. The key must be \"data\", the value is hex-encoded data", RPCArg::Type::STR_HEX, false},
                                 },
                                 true},
                         },
                         false},
-                    RPCArg{"locktime", RPCArg::Type::NUM, true},
-                    RPCArg{"replacable", RPCArg::Type::BOOL, true},
+                    RPCArg{"locktime", "Raw locktime. Non-0 value also locktime-activates inputs", RPCArg::Type::NUM, true},
+                    RPCArg{"replacable", "Marks this transaction as BIP125 replaceable.\n"
+                                         "Allows this transaction to be replaced by a transaction with higher fees. If provided, it is an error if explicit sequence numbers are incompatible.",
+                        RPCArg::Type::BOOL, true},
                 }}
                 .ToString() +
-                            "\nArguments:\n"
-                            "1. \"inputs\"                (array, required) A json array of json objects\n"
-                            "     [\n"
-                            "       {\n"
-                            "         \"txid\":\"id\",      (string, required) The transaction id\n"
-                            "         \"vout\":n,         (numeric, required) The output number\n"
-                            "         \"sequence\":n      (numeric, optional) The sequence number\n"
-                            "       } \n"
-                            "       ,...\n"
-                            "     ]\n"
-                            "2. \"outputs\"               (array, required) a json array with outputs (key-value pairs)\n"
-                            "   [\n"
-                            "    {\n"
-                            "      \"address\": x.xxx,    (obj, optional) A key-value pair. The key (string) is the bitcoin address, the value (float or string) is the amount in " + CURRENCY_UNIT + "\n"
-                            "    },\n"
-                            "    {\n"
-                            "      \"data\": \"hex\"        (obj, optional) A key-value pair. The key must be \"data\", the value is hex-encoded data\n"
-                            "    }\n"
-                            "    ,...                     More key-value pairs of the above form. For compatibility reasons, a dictionary, which holds the key-value pairs directly, is also\n"
-                            "                             accepted as second parameter.\n"
-                            "   ]\n"
-                            "3. locktime                  (numeric, optional, default=0) Raw locktime. Non-0 value also locktime-activates inputs\n"
-                            "4. replaceable               (boolean, optional, default=false) Marks this transaction as BIP125 replaceable.\n"
-                            "                             Allows this transaction to be replaced by a transaction with higher fees. If provided, it is an error if explicit sequence numbers are incompatible.\n"
                             "\nResult:\n"
                             "  \"psbt\"        (string)  The resulting raw transaction (base64-encoded string)\n"
                             "\nExamples:\n"

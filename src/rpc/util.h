@@ -27,7 +27,7 @@ UniValue DescribeAddress(const CTxDestination& dest);
 class RPCHelpTableRow
 {
 private:
-    const std::string m_left;
+    std::string m_left;
     const std::string m_right;
 
 public:
@@ -37,6 +37,8 @@ public:
 
     std::vector<std::string> RightLines() const;
     std::string const& Left() const;
+    void PrefixLeft(const std::string& s);
+    void SuffixLeft(const std::string& s);
 };
 
 class RPCHelpTable
@@ -52,7 +54,7 @@ public:
 
     void AddRow(const RPCHelpTableRow& row);
 
-    std::string AsText() const;
+    std::string ToString() const;
 };
 
 
@@ -70,23 +72,32 @@ struct RPCArg {
     const Type m_type;
     const std::vector<RPCArg> m_inner; //!< Only used for arrays or dicts
     const bool m_optional;
+    const std::string m_description;
 
-    RPCArg(const std::string& name, const Type& type, const bool optional)
-        : m_name{name}, m_type{type}, m_optional{optional}
+    RPCArg(const std::string& name, const std::string& description, const Type& type, const bool optional)
+        : m_name{name}, m_type{type}, m_optional{optional}, m_description(description)
     {
         assert(type != Type::ARR && type != Type::OBJ);
     }
 
-    RPCArg(const std::string& name, const Type& type, const std::vector<RPCArg>& inner, const bool optional)
-        : m_name{name}, m_type{type}, m_inner{inner}, m_optional{optional}
+    RPCArg(const std::string& name, const std::string& description, const Type& type, const std::vector<RPCArg>& inner, const bool optional)
+        : m_name{name}, m_type{type}, m_inner{inner}, m_optional{optional}, m_description(description)
     {
         assert(type == Type::ARR || type == Type::OBJ);
     }
 
     std::string ToStringFirstLine(bool shortenIfLong) const;
+    std::vector<RPCHelpTableRow> ToTableRows(int i) const;
 
 private:
+    RPCHelpTableRow ToTableRowSimple(const std::string& prefix) const;
+    std::vector<RPCHelpTableRow> ToTableRowsObj(const std::string& prefix) const;
+    std::vector<RPCHelpTableRow> ToTableRowsStructure(const std::string& prefix) const;
     std::string ToStringObjFirstLine() const;
+    std::string ToTableLeftObj() const;
+    std::string ToTableLeft() const;
+    std::string TypeString() const;
+    std::string TypeAndInfoString() const;
 };
 
 class RPCHelpMan
@@ -105,6 +116,7 @@ private:
     const std::string m_description;
 
     std::string ToStringFirstLine() const;
+    RPCHelpTable ToArgTable() const;
 };
 
 #endif // BITCOIN_RPC_UTIL_H

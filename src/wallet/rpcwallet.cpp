@@ -2178,30 +2178,19 @@ static UniValue lockunspent(const JSONRPCRequest& request)
                 "is always cleared (by virtue of process exit) when a node stops or fails.\n"
                 "Also see the listunspent call",
                 {
-                    RPCArg{"unlock", RPCArg::Type::BOOL, false},
-                    RPCArg{"transactions", RPCArg::Type::ARR,
+                    RPCArg{"unlock", "Whether to unlock (true) or lock (false) the specified transactions", RPCArg::Type::BOOL, false},
+                    RPCArg{"transactions", "A json array of objects. Each object the txid (string) vout (numeric)", RPCArg::Type::ARR,
                         {
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"txid", RPCArg::Type::STR, false},
-                                    RPCArg{"vout", RPCArg::Type::NUM, false},
+                                    RPCArg{"txid", "The transaction id", RPCArg::Type::STR, false},
+                                    RPCArg{"vout", "The output number", RPCArg::Type::NUM, false},
                                 },
                                 true},
                         },
                         true},
                 }}
                 .ToString() +
-            "\nArguments:\n"
-            "1. unlock            (boolean, required) Whether to unlock (true) or lock (false) the specified transactions\n"
-            "2. \"transactions\"  (string, optional) A json array of objects. Each object the txid (string) vout (numeric)\n"
-            "     [           (json array of json objects)\n"
-            "       {\n"
-            "         \"txid\":\"id\",    (string) The transaction id\n"
-            "         \"vout\": n         (numeric) The output number\n"
-            "       }\n"
-            "       ,...\n"
-            "     ]\n"
-
             "\nResult:\n"
             "true|false    (boolean) Whether the command was successful or not\n"
 
@@ -2729,41 +2718,26 @@ static UniValue listunspent(const JSONRPCRequest& request)
                 "with between minconf and maxconf (inclusive) confirmations.\n"
                 "Optionally filter to only include txouts paid to specified addresses.",
                 {
-                    RPCArg{"minconf", RPCArg::Type::NUM, true},
-                    RPCArg{"maxconf", RPCArg::Type::NUM, true},
-                    RPCArg{"addresses", RPCArg::Type::ARR,
+                    RPCArg{"minconf", "The minimum confirmations to filter", RPCArg::Type::NUM, true},
+                    RPCArg{"maxconf", "The maximum confirmations to filter", RPCArg::Type::NUM, true},
+                    RPCArg{"addresses", "A json array of bitcoin addresses to filter", RPCArg::Type::ARR,
                         {
-                            RPCArg{"address", RPCArg::Type::STR, true},
+                            RPCArg{"address", "bitcoin address", RPCArg::Type::STR, true},
                         },
                         true},
-                    RPCArg{"include_unsafe", RPCArg::Type::BOOL, true},
-                    RPCArg{"query_options", RPCArg::Type::OBJ,
+                    RPCArg{"include_unsafe", "Include outputs that are not safe to spend\n"
+                                             "See description of \"safe\" attribute below.",
+                        RPCArg::Type::BOOL, true},
+                    RPCArg{"query_options", "JSON with query options", RPCArg::Type::OBJ,
                         {
-                            RPCArg{"minimumAmount", RPCArg::Type::NUM, true},
-                            RPCArg{"maximumAmount", RPCArg::Type::NUM, true},
-                            RPCArg{"maximumCount", RPCArg::Type::NUM, true},
-                            RPCArg{"minimumSumAmount", RPCArg::Type::NUM, true},
+                            RPCArg{"minimumAmount", "Minimum value of each UTXO in " + CURRENCY_UNIT, RPCArg::Type::NUM, true},
+                            RPCArg{"maximumAmount", "Maximum value of each UTXO in " + CURRENCY_UNIT, RPCArg::Type::NUM, true},
+                            RPCArg{"maximumCount", "Maximum number of UTXOs", RPCArg::Type::NUM, true},
+                            RPCArg{"minimumSumAmount", "Minimum sum value of all UTXOs in " + CURRENCY_UNIT, RPCArg::Type::NUM, true},
                         },
                         true},
                 }}
                 .ToString() +
-            "\nArguments:\n"
-            "1. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
-            "2. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
-            "3. \"addresses\"      (string) A json array of bitcoin addresses to filter\n"
-            "    [\n"
-            "      \"address\"     (string) bitcoin address\n"
-            "      ,...\n"
-            "    ]\n"
-            "4. include_unsafe (bool, optional, default=true) Include outputs that are not safe to spend\n"
-            "                  See description of \"safe\" attribute below.\n"
-            "5. query_options    (json, optional) JSON with query options\n"
-            "    {\n"
-            "      \"minimumAmount\"    (numeric or string, default=0) Minimum value of each UTXO in " + CURRENCY_UNIT + "\n"
-            "      \"maximumAmount\"    (numeric or string, default=unlimited) Maximum value of each UTXO in " + CURRENCY_UNIT + "\n"
-            "      \"maximumCount\"     (numeric or string, default=unlimited) Maximum number of UTXOs\n"
-            "      \"minimumSumAmount\" (numeric or string, default=unlimited) Minimum sum value of all UTXOs in " + CURRENCY_UNIT + "\n"
-            "    }\n"
             "\nResult\n"
             "[                   (array of json object)\n"
             "  {\n"
@@ -3123,44 +3097,30 @@ UniValue signrawtransactionwithwallet(const JSONRPCRequest& request)
                 "this transaction depends on but may not yet be in the block chain." +
                     HelpRequiringPassphrase(pwallet),
                 {
-                    RPCArg{"hexstring", RPCArg::Type::STR, false},
-                    RPCArg{"prevtxs", RPCArg::Type::ARR,
+                    RPCArg{"hexstring", "The transaction hex string", RPCArg::Type::STR, false},
+                    RPCArg{"prevtxs", "An json array of previous dependent transaction outputs, or 'null' if none provided", RPCArg::Type::ARR,
                         {
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"txid", RPCArg::Type::STR, false},
-                                    RPCArg{"vout", RPCArg::Type::NUM, false},
-                                    RPCArg{"scriptPubKey", RPCArg::Type::STR_HEX, false},
-                                    RPCArg{"redeemScript", RPCArg::Type::STR_HEX, false},
-                                    RPCArg{"amount", RPCArg::Type::AMOUNT, false},
+                                    RPCArg{"txid", "The transaction id", RPCArg::Type::STR, false},
+                                    RPCArg{"vout", "The output number", RPCArg::Type::NUM, false},
+                                    RPCArg{"scriptPubKey", "script key", RPCArg::Type::STR_HEX, false},
+                                    RPCArg{"redeemScript", "redeem script, required for P2SH or P2WSH", RPCArg::Type::STR_HEX, false},
+                                    RPCArg{"amount", "The amount spent", RPCArg::Type::AMOUNT, false},
                                 },
                                 false},
                         },
                         true},
-                    RPCArg{"sighashtype", RPCArg::Type::STR, true},
+                    RPCArg{"sighashtype", "The signature hash type. Must be one of\n"
+                                          "- \"ALL\"\n"
+                                          "- \"NONE\"\n"
+                                          "- \"SINGLE\"\n"
+                                          "- \"ALL|ANYONECANPAY\"\n"
+                                          "- \"NONE|ANYONECANPAY\"\n"
+                                          "- \"SINGLE|ANYONECANPAY\"",
+                        RPCArg::Type::STR, true},
                 }}
                 .ToString() +
-            "Arguments:\n"
-            "1. \"hexstring\"                      (string, required) The transaction hex string\n"
-            "2. \"prevtxs\"                        (string, optional) An json array of previous dependent transaction outputs\n"
-            "     [                              (json array of json objects, or 'null' if none provided)\n"
-            "       {\n"
-            "         \"txid\":\"id\",               (string, required) The transaction id\n"
-            "         \"vout\":n,                  (numeric, required) The output number\n"
-            "         \"scriptPubKey\": \"hex\",     (string, required) script key\n"
-            "         \"redeemScript\": \"hex\",     (string, required for P2SH or P2WSH) redeem script\n"
-            "         \"amount\": value            (numeric, required) The amount spent\n"
-            "       }\n"
-            "       ,...\n"
-            "    ]\n"
-            "3. \"sighashtype\"                    (string, optional, default=ALL) The signature hash type. Must be one of\n"
-            "       \"ALL\"\n"
-            "       \"NONE\"\n"
-            "       \"SINGLE\"\n"
-            "       \"ALL|ANYONECANPAY\"\n"
-            "       \"NONE|ANYONECANPAY\"\n"
-            "       \"SINGLE|ANYONECANPAY\"\n"
-
             "\nResult:\n"
             "{\n"
             "  \"hex\" : \"value\",                  (string) The hex-encoded raw transaction with signature(s)\n"
@@ -4026,99 +3986,67 @@ UniValue walletcreatefundedpsbt(const JSONRPCRequest& request)
                 "Creates and funds a transaction in the Partially Signed Transaction format. Inputs will be added if supplied inputs are not enough.\n"
                 "Implements the Creator and Updater roles.",
                 {
-                    RPCArg{"inputs", RPCArg::Type::ARR,
+                    RPCArg{"inputs", "A json array of json objects", RPCArg::Type::ARR,
                         {
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"txid", RPCArg::Type::STR, false},
-                                    RPCArg{"vout", RPCArg::Type::NUM, false},
-                                    RPCArg{"sequence", RPCArg::Type::NUM, false},
+                                    RPCArg{"txid", "The transaction id", RPCArg::Type::STR_HEX, false},
+                                    RPCArg{"vout", "The output number", RPCArg::Type::NUM, false},
+                                    RPCArg{"sequence", "The sequence number", RPCArg::Type::NUM, false},
                                 },
                                 false},
                         },
                         false},
-                    RPCArg{"outputs", RPCArg::Type::ARR,
+                    RPCArg{"outputs", "A json array with outputs (key-value pairs).\n"
+                                      "For compatibility reasons, a dictionary, which holds the key-value pairs directly, is also\n"
+                                      "accepted as second parameter.",
+                        RPCArg::Type::ARR,
                         {
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"address", RPCArg::Type::AMOUNT, true},
+                                    RPCArg{"address", "A key-value pair. The key (string) is the bitcoin address, the value (float or string) is the amount in " + CURRENCY_UNIT, RPCArg::Type::AMOUNT, true},
                                 },
                                 true},
-                            RPCArg{"", RPCArg::Type::OBJ,
+                            RPCArg{"", "", RPCArg::Type::OBJ,
                                 {
-                                    RPCArg{"data", RPCArg::Type::STR_HEX, true},
+                                    RPCArg{"data", "A key-value pair. The key must be \"data\", the value is hex-encoded data", RPCArg::Type::STR_HEX, true},
                                 },
                                 true},
                         },
                         false},
-                    RPCArg{"locktime", RPCArg::Type::NUM, true},
-                    RPCArg{"options", RPCArg::Type::OBJ,
+                    RPCArg{"locktime", "Raw locktime. Non-0 value also locktime-activates inputs\n"
+                                       "Allows this transaction to be replaced by a transaction with higher fees. If provided, it is an error if explicit sequence numbers are incompatible.",
+                        RPCArg::Type::NUM, true},
+                    RPCArg{"options", "", RPCArg::Type::OBJ,
                         {
-                            RPCArg{"changeAddress", RPCArg::Type::STR, true},
-                            RPCArg{"changePosition", RPCArg::Type::NUM, true},
-                            RPCArg{"change_type", RPCArg::Type::STR, true},
-                            RPCArg{"includeWatching", RPCArg::Type::BOOL, true},
-                            RPCArg{"lockUnspents", RPCArg::Type::BOOL, true},
-                            RPCArg{"feeRate", RPCArg::Type::NUM, true},
-                            RPCArg{"subtractFeeFromOutputs", RPCArg::Type::ARR,
+                            RPCArg{"changeAddress", "The bitcoin address to receive the change", RPCArg::Type::STR, true},
+                            RPCArg{"changePosition", "The index of the change output", RPCArg::Type::NUM, true},
+                            RPCArg{"change_type", "The output type to use. Only valid if changeAddress is not specified. Options are \"legacy\", \"p2sh-segwit\", and \"bech32\". Default is set by -changetype.", RPCArg::Type::STR, true},
+                            RPCArg{"includeWatching", "Also select inputs which are watch only", RPCArg::Type::BOOL, true},
+                            RPCArg{"lockUnspents", "Lock selected unspent outputs", RPCArg::Type::BOOL, true},
+                            RPCArg{"feeRate", "Set a specific fee rate in " + CURRENCY_UNIT + "/kB", RPCArg::Type::NUM, true},
+                            RPCArg{"subtractFeeFromOutputs", "A json array of integers.\n"
+                                                             "The fee will be equally deducted from the amount of each specified output.\n"
+                                                             "The outputs are specified by their zero-based index, before any change output is added.\n"
+                                                             "Those recipients will receive less bitcoins than you enter in their corresponding amount field.\n"
+                                                             "If no outputs are specified here, the sender pays the fee.",
+                                RPCArg::Type::ARR,
                                 {
-                                    RPCArg{"int", RPCArg::Type::NUM, true},
+                                    RPCArg{"vout_index", "", RPCArg::Type::NUM, true},
                                 },
                                 true},
-                            RPCArg{"replaceable", RPCArg::Type::BOOL, true},
-                            RPCArg{"conf_target", RPCArg::Type::NUM, true},
-                            RPCArg{"estimate_mode", RPCArg::Type::STR, true},
+                            RPCArg{"replaceable", "Marks this transaction as BIP125 replaceable.", RPCArg::Type::BOOL, true},
+                            RPCArg{"conf_target", "Confirmation target (in blocks)", RPCArg::Type::NUM, true},
+                            RPCArg{"estimate_mode", "The fee estimate mode, must be one of:\n"
+                                                    "- \"UNSET\"\n"
+                                                    "- \"ECONOMICAL\"\n"
+                                                    "- \"CONSERVATIVE\"",
+                                RPCArg::Type::STR, true},
                         },
                         true},
-                    RPCArg{"bip32derivs", RPCArg::Type::BOOL, true},
+                    RPCArg{"bip32derivs", "If true, includes the BIP 32 derivation paths for public keys if we know them", RPCArg::Type::BOOL, true},
                 }}
                 .ToString() +
-                            "Arguments:\n"
-                            "1. \"inputs\"                (array, required) A json array of json objects\n"
-                            "     [\n"
-                            "       {\n"
-                            "         \"txid\":\"id\",      (string, required) The transaction id\n"
-                            "         \"vout\":n,         (numeric, required) The output number\n"
-                            "         \"sequence\":n      (numeric, optional) The sequence number\n"
-                            "       } \n"
-                            "       ,...\n"
-                            "     ]\n"
-                            "2. \"outputs\"               (array, required) a json array with outputs (key-value pairs)\n"
-                            "   [\n"
-                            "    {\n"
-                            "      \"address\": x.xxx,    (obj, optional) A key-value pair. The key (string) is the bitcoin address, the value (float or string) is the amount in " + CURRENCY_UNIT + "\n"
-                            "    },\n"
-                            "    {\n"
-                            "      \"data\": \"hex\"        (obj, optional) A key-value pair. The key must be \"data\", the value is hex-encoded data\n"
-                            "    }\n"
-                            "    ,...                     More key-value pairs of the above form. For compatibility reasons, a dictionary, which holds the key-value pairs directly, is also\n"
-                            "                             accepted as second parameter.\n"
-                            "   ]\n"
-                            "3. locktime                  (numeric, optional, default=0) Raw locktime. Non-0 value also locktime-activates inputs\n"
-                            "                             Allows this transaction to be replaced by a transaction with higher fees. If provided, it is an error if explicit sequence numbers are incompatible.\n"
-                            "4. options                 (object, optional)\n"
-                            "   {\n"
-                            "     \"changeAddress\"          (string, optional, default pool address) The bitcoin address to receive the change\n"
-                            "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
-                            "     \"change_type\"            (string, optional) The output type to use. Only valid if changeAddress is not specified. Options are \"legacy\", \"p2sh-segwit\", and \"bech32\". Default is set by -changetype.\n"
-                            "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
-                            "     \"lockUnspents\"           (boolean, optional, default false) Lock selected unspent outputs\n"
-                            "     \"feeRate\"                (numeric, optional, default not set: makes wallet determine the fee) Set a specific fee rate in " + CURRENCY_UNIT + "/kB\n"
-                            "     \"subtractFeeFromOutputs\" (array, optional) A json array of integers.\n"
-                            "                              The fee will be equally deducted from the amount of each specified output.\n"
-                            "                              The outputs are specified by their zero-based index, before any change output is added.\n"
-                            "                              Those recipients will receive less bitcoins than you enter in their corresponding amount field.\n"
-                            "                              If no outputs are specified here, the sender pays the fee.\n"
-                            "                                  [vout_index,...]\n"
-                            "     \"replaceable\"            (boolean, optional) Marks this transaction as BIP125 replaceable.\n"
-                            "                              Allows this transaction to be replaced by a transaction with higher fees\n"
-                            "     \"conf_target\"            (numeric, optional) Confirmation target (in blocks)\n"
-                            "     \"estimate_mode\"          (string, optional, default=UNSET) The fee estimate mode, must be one of:\n"
-                            "         \"UNSET\"\n"
-                            "         \"ECONOMICAL\"\n"
-                            "         \"CONSERVATIVE\"\n"
-                            "   }\n"
-                            "5. bip32derivs                    (boolean, optional, default=false) If true, includes the BIP 32 derivation paths for public keys if we know them\n"
                             "\nResult:\n"
                             "{\n"
                             "  \"psbt\": \"value\",        (string)  The resulting raw transaction (base64-encoded string)\n"

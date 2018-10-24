@@ -139,11 +139,6 @@ std::vector<std::string> RPCHelpTableRow::RightLines() const
     return res;
 }
 
-std::string const& RPCHelpTableRow::Left() const
-{
-    return m_left;
-}
-
 size_t RPCHelpTable::PrefixLength() const
 {
     size_t max = 0;
@@ -161,7 +156,7 @@ void RPCHelpTable::AddRow(const RPCHelpTableRow& row)
     m_rows.emplace_back(row);
 }
 
-std::string RPCHelpTable::AsText() const
+std::string RPCHelpTable::ToString() const
 {
     std::string res;
     res += m_name;
@@ -197,7 +192,11 @@ std::string RPCHelpMan::ToString() const
         return ret;
     }
 
-    return ret + "\n" + m_description + "\n\n";
+    ret = ret + "\n" + m_description + "\n\n";
+    if (!m_args.empty()) {
+        ret = ret + ToArgTable().ToString();
+    }
+    return ret;
 }
 
 std::string RPCHelpMan::ToStringFirstLine() const
@@ -224,6 +223,56 @@ std::string RPCHelpMan::ToStringFirstLine() const
     return ret;
 }
 
+std::vector<RPCHelpTableRow> RPCArg::ToTableRowsObj(const std::string& prefix) const
+{
+    auto newPrefix = prefix + "  ";
+    std::vector<RPCHelpTableRow> res = {};
+    switch (m_type) {
+    case Type::ARR: {
+        res.emplace_back(prefix + "\"" + m_name + "\": [", TypeAndInfoString() + " " + m_description);
+        for (const auto& i : m_inner) {
+            for (const auto& r : i.ToTableRowsStructure(newPrefix)) {
+                res.emplace_back(r);
+            }
+        }
+        res.emplace_back(newPrefix + ",...", "");
+        res.emplace_back(prefix + "]", "");
+        return res;
+    }
+    case Type::OBJ:
+        assert(false);
+    default: {
+        res.emplace_back(prefix + ToTableLeftObj(), TypeAndInfoString() + " " + m_description);
+        return res;
+    }
+    }
+}
+
+std::string RPCArg::ToTableLeftObj() const
+{
+    std::string res = "\"" + m_name + "\"";
+    switch (m_type) {
+    case Type::STR:
+        return res + ": \"string\"";
+    case Type::STR_HEX:
+        return res + ": \"hex\"";
+    case Type::NUM:
+        return res + ": n";
+    case Type::AMOUNT:
+        return res + ": x.xxxx";
+    case Type::BOOL:
+        return res + ": true|false";
+    case Type::ARR:
+        assert(false);
+    case Type::OBJ:
+        // Currently unused, so avoid writing dead code
+        assert(false);
+
+        // no default case, so the compiler can warn about missing cases
+    }
+    assert(false);
+}
+
 std::string RPCArg::ToStringObjFirstLine() const
 {
     std::string res = "\"" + m_name + "\"";
@@ -248,6 +297,152 @@ std::string RPCArg::ToStringObjFirstLine() const
         // Currently unused, so avoid writing dead code
         assert(false);
 
+        // no default case, so the compiler can warn about missing cases
+    }
+    assert(false);
+}
+
+void RPCHelpTableRow::PrefixLeft(const std::string& s)
+{
+    m_left = s + m_left;
+}
+
+void RPCHelpTableRow::SuffixLeft(const std::string& s)
+{
+    m_left = m_left + s;
+}
+std::string const& RPCHelpTableRow::Left() const
+{
+    return m_left;
+}
+
+std::vector<RPCHelpTableRow> RPCArg::ToTableRowsStructure(const std::string& prefix) const
+{
+    auto newPrefix = prefix + "  ";
+    std::vector<RPCHelpTableRow> res = {};
+    if (m_type == Type::OBJ) {
+        res.emplace_back(RPCHelpTableRow(prefix + "{", ""));
+        for (size_t i = 0; i < m_inner.size(); i++) {
+            auto arg = m_inner[i];
+            for (RPCHelpTableRow row : arg.ToTableRowsObj(newPrefix)) {
+                res.emplace_back(row);
+            }
+            if (i != m_inner.size() - 1) {
+                res.back().SuffixLeft(",");
+            }
+        }
+        res.emplace_back(RPCHelpTableRow(prefix + "}", ""));
+        return res;
+    }
+
+    if (m_type == Type::ARR) {
+        res.emplace_back(prefix + "[", "");
+        for (size_t i = 0; i < m_inner.size(); i++) {
+            auto arg = m_inner[i];
+            for (const auto& r : arg.ToTableRowsStructure(newPrefix)) {
+                res.emplace_back(r);
+            }
+            if (i != m_inner.size() - 1) {
+                res.back().SuffixLeft(",");
+            }
+        }
+        res.emplace_back(newPrefix + ",...", "");
+        res.emplace_back(prefix + "]", "");
+        return res;
+    }
+    return {ToTableRowSimple(prefix)};
+}
+
+RPCHelpTableRow RPCArg::ToTableRowSimple(const std::string& prefix) const
+{
+    std::string left = prefix + ToTableLeft();
+
+    std::string right = TypeAndInfoString() + " " + m_description;
+    RPCHelpTableRow r = RPCHelpTableRow(left, right);
+    return r;
+}
+
+
+std::vector<RPCHelpTableRow> RPCArg::ToTableRows(int i) const
+{
+    std::string i_s = std::to_string(i);
+    RPCHelpTableRow r = ToTableRowSimple(i_s + ". ");
+
+    std::vector<RPCHelpTableRow> res = {r};
+    if (m_type == Type::ARR || m_type == Type::OBJ) {
+        for (const auto& row : ToTableRowsStructure("  ")) {
+            res.emplace_back(row);
+        }
+    }
+    return res;
+}
+
+std::string RPCArg::TypeAndInfoString() const
+{
+    std::string res = "(";
+    res += TypeString();
+    res += ", ";
+    if (m_optional) {
+        res += "optional";
+    } else {
+        res += "required";
+    }
+    res += ")";
+    return res;
+}
+
+RPCHelpTable RPCHelpMan::ToArgTable() const
+{
+    RPCHelpTable res = RPCHelpTable("Arguments");
+    for (size_t i = 0; i < m_args.size(); i++) {
+        auto arg = m_args[i];
+        auto rows = arg.ToTableRows(i + 1);
+        for (auto row : rows) {
+            res.AddRow(row);
+        }
+    }
+    return res;
+}
+
+std::string RPCArg::TypeString() const
+{
+    switch (m_type) {
+    case Type::STR_HEX:
+    case Type::STR: {
+        return "string";
+    }
+    case Type::OBJ: {
+        return "object";
+    }
+    case Type::ARR: {
+        return "array";
+    }
+    case Type::NUM:
+    case Type::AMOUNT: {
+        return "numberic";
+    }
+    case Type::BOOL: {
+        return "bool";
+    }
+        // no default case, so the compiler can warn about missing cases
+    }
+    assert(false);
+}
+
+std::string RPCArg::ToTableLeft() const
+{
+    switch (m_type) {
+    case Type::STR_HEX:
+    case Type::STR: {
+        return "\"" + m_name + "\"";
+    }
+    case Type::OBJ:
+    case Type::ARR:
+    case Type::NUM:
+    case Type::AMOUNT:
+    case Type::BOOL: {
+        return m_name;
+    }
         // no default case, so the compiler can warn about missing cases
     }
     assert(false);
