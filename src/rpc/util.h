@@ -51,17 +51,17 @@ struct RPCArg {
         assert(type == Type::ARR || type == Type::OBJ);
     }
 
-    std::string ToString() const;
+    std::string ToStringFirstLine() const;
 
 private:
-    std::string ToStringObj() const;
+    std::string ToStringObjFirstLine() const;
 };
 
 class RPCHelpMan
 {
 public:
-    RPCHelpMan(const std::string& name, const std::vector<RPCArg>& args)
-        : m_name{name}, m_args{args}
+    RPCHelpMan(const std::string& name, const std::string& description, const std::vector<RPCArg>& args)
+        : m_name{name}, m_args{args}, m_description{description}
     {
     }
 
@@ -70,6 +70,9 @@ public:
 private:
     const std::string m_name;
     const std::vector<RPCArg> m_args;
+    const std::string m_description;
+
+    std::string ToStringFirstLine() const;
 };
 
 #endif // BITCOIN_RPC_UTIL_H

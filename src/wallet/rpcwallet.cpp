@@ -2170,6 +2170,13 @@ static UniValue lockunspent(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw std::runtime_error(
             RPCHelpMan{"lockunspent",
+                "Updates list of temporarily unspendable outputs.\n"
+                "Temporarily lock (unlock=false) or unlock (unlock=true) specified transaction outputs.\n"
+                "If no transaction outputs are specified when unlocking then all current locked transaction outputs are unlocked.\n"
+                "A locked transaction output will not be chosen by automatic coin selection, when spending bitcoins.\n"
+                "Locks are stored in memory only. Nodes start with zero locked outputs, and the locked output list\n"
+                "is always cleared (by virtue of process exit) when a node stops or fails.\n"
+                "Also see the listunspent call",
                 {
                     RPCArg{"unlock", RPCArg::Type::BOOL, false},
                     RPCArg{"transactions", RPCArg::Type::ARR,
@@ -2184,13 +2191,6 @@ static UniValue lockunspent(const JSONRPCRequest& request)
                         true},
                 }}
                 .ToString() +
-            "\nUpdates list of temporarily unspendable outputs.\n"
-            "Temporarily lock (unlock=false) or unlock (unlock=true) specified transaction outputs.\n"
-            "If no transaction outputs are specified when unlocking then all current locked transaction outputs are unlocked.\n"
-            "A locked transaction output will not be chosen by automatic coin selection, when spending bitcoins.\n"
-            "Locks are stored in memory only. Nodes start with zero locked outputs, and the locked output list\n"
-            "is always cleared (by virtue of process exit) when a node stops or fails.\n"
-            "Also see the listunspent call\n"
             "\nArguments:\n"
             "1. unlock            (boolean, required) Whether to unlock (true) or lock (false) the specified transactions\n"
             "2. \"transactions\"  (string, optional) A json array of objects. Each object the txid (string) vout (numeric)\n"
@@ -2725,6 +2725,9 @@ static UniValue listunspent(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() > 5)
         throw std::runtime_error(
             RPCHelpMan{"listunspent",
+                "Returns array of unspent transaction outputs\n"
+                "with between minconf and maxconf (inclusive) confirmations.\n"
+                "Optionally filter to only include txouts paid to specified addresses.",
                 {
                     RPCArg{"minconf", RPCArg::Type::NUM, true},
                     RPCArg{"maxconf", RPCArg::Type::NUM, true},
@@ -2744,9 +2747,6 @@ static UniValue listunspent(const JSONRPCRequest& request)
                         true},
                 }}
                 .ToString() +
-            "\nReturns array of unspent transaction outputs\n"
-            "with between minconf and maxconf (inclusive) confirmations.\n"
-            "Optionally filter to only include txouts paid to specified addresses.\n"
             "\nArguments:\n"
             "1. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
             "2. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
@@ -3118,6 +3118,10 @@ UniValue signrawtransactionwithwallet(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
         throw std::runtime_error(
             RPCHelpMan{"signrawtransactionwithwallet",
+                "Sign inputs for raw transaction (serialized, hex-encoded).\n"
+                "The second optional argument (may be null) is an array of previous transaction outputs that\n"
+                "this transaction depends on but may not yet be in the block chain." +
+                    HelpRequiringPassphrase(pwallet),
                 {
                     RPCArg{"hexstring", RPCArg::Type::STR, false},
                     RPCArg{"prevtxs", RPCArg::Type::ARR,
@@ -3136,12 +3140,7 @@ UniValue signrawtransactionwithwallet(const JSONRPCRequest& request)
                     RPCArg{"sighashtype", RPCArg::Type::STR, true},
                 }}
                 .ToString() +
-            "\nSign inputs for raw transaction (serialized, hex-encoded).\n"
-            "The second optional argument (may be null) is an array of previous transaction outputs that\n"
-            "this transaction depends on but may not yet be in the block chain.\n"
-            + HelpRequiringPassphrase(pwallet) + "\n"
-
-            "\nArguments:\n"
+            "Arguments:\n"
             "1. \"hexstring\"                      (string, required) The transaction hex string\n"
             "2. \"prevtxs\"                        (string, optional) An json array of previous dependent transaction outputs\n"
             "     [                              (json array of json objects, or 'null' if none provided)\n"
@@ -4024,6 +4023,8 @@ UniValue walletcreatefundedpsbt(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 5)
         throw std::runtime_error(
             RPCHelpMan{"walletcreatefundedpsbt",
+                "Creates and funds a transaction in the Partially Signed Transaction format. Inputs will be added if supplied inputs are not enough.\n"
+                "Implements the Creator and Updater roles.",
                 {
                     RPCArg{"inputs", RPCArg::Type::ARR,
                         {
@@ -4072,9 +4073,7 @@ UniValue walletcreatefundedpsbt(const JSONRPCRequest& request)
                     RPCArg{"bip32derivs", RPCArg::Type::BOOL, true},
                 }}
                 .ToString() +
-                            "\nCreates and funds a transaction in the Partially Signed Transaction format. Inputs will be added if supplied inputs are not enough\n"
-                            "Implements the Creator and Updater roles.\n"
-                            "\nArguments:\n"
+                            "Arguments:\n"
                             "1. \"inputs\"                (array, required) A json array of json objects\n"
                             "     [\n"
                             "       {\n"

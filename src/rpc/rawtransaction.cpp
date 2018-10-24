@@ -206,6 +206,12 @@ static UniValue gettxoutproof(const JSONRPCRequest& request)
     if (request.fHelp || (request.params.size() != 1 && request.params.size() != 2))
         throw std::runtime_error(
             RPCHelpMan{"gettxoutproof",
+                "Returns a hex-encoded proof that \"txid\" was included in a block.\n"
+                "\n"
+                "NOTE: By default this function only works sometimes. This is when there is an\n"
+                "unspent output in the utxo for this transaction. To make it always work,\n"
+                "you need to maintain a transaction index, using the -txindex command line option or\n"
+                "specify the block in which the transaction is included manually (by blockhash).",
                 {
                     RPCArg{"txids", RPCArg::Type::ARR,
                         {
@@ -215,11 +221,7 @@ static UniValue gettxoutproof(const JSONRPCRequest& request)
                     RPCArg{"blockhash", RPCArg::Type::STR, true},
                 }}
                 .ToString() +
-            "\nReturns a hex-encoded proof that \"txid\" was included in a block.\n"
-            "\nNOTE: By default this function only works sometimes. This is when there is an\n"
-            "unspent output in the utxo for this transaction. To make it always work,\n"
-            "you need to maintain a transaction index, using the -txindex command line option or\n"
-            "specify the block in which the transaction is included manually (by blockhash).\n"
+
             "\nArguments:\n"
             "1. \"txids\"       (string) A json array of txids to filter\n"
             "    [\n"
@@ -685,6 +687,9 @@ static UniValue combinerawtransaction(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
             RPCHelpMan{"combinerawtransaction",
+                "Combine multiple partially signed transactions into one transaction.\n"
+                "The combined transaction may be another partially signed transaction or a \n"
+                "fully signed transaction.",
                 {
                     RPCArg{"txs", RPCArg::Type::ARR,
                         {
@@ -693,9 +698,7 @@ static UniValue combinerawtransaction(const JSONRPCRequest& request)
                         false},
                 }}
                 .ToString() +
-            "\nCombine multiple partially signed transactions into one transaction.\n"
-            "The combined transaction may be another partially signed transaction or a \n"
-            "fully signed transaction."
+
 
             "\nArguments:\n"
             "1. \"txs\"         (string) A json array of hex strings of partially signed transactions\n"
@@ -916,6 +919,11 @@ static UniValue signrawtransactionwithkey(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
         throw std::runtime_error(
             RPCHelpMan{"signrawtransactionwithkey",
+                "Sign inputs for raw transaction (serialized, hex-encoded).\n"
+                "The second argument is an array of base58-encoded private\n"
+                "keys that will be the only keys used to sign the transaction.\n"
+                "The third optional argument (may be null) is an array of previous transaction outputs that\n"
+                "this transaction depends on but may not yet be in the block chain.",
                 {
                     RPCArg{"hexstring", RPCArg::Type::STR, false},
                     RPCArg{"privkyes", RPCArg::Type::ARR,
@@ -939,12 +947,6 @@ static UniValue signrawtransactionwithkey(const JSONRPCRequest& request)
                     RPCArg{"sighashtype", RPCArg::Type::STR, true},
                 }}
                 .ToString() +
-            "\nSign inputs for raw transaction (serialized, hex-encoded).\n"
-            "The second argument is an array of base58-encoded private\n"
-            "keys that will be the only keys used to sign the transaction.\n"
-            "The third optional argument (may be null) is an array of previous transaction outputs that\n"
-            "this transaction depends on but may not yet be in the block chain.\n"
-
             "\nArguments:\n"
             "1. \"hexstring\"                      (string, required) The transaction hex string\n"
             "2. \"privkeys\"                       (string, required) A json array of base58-encoded private keys for signing\n"
@@ -1494,6 +1496,8 @@ UniValue combinepsbt(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
             RPCHelpMan{"combinepsbt",
+                "Combine multiple partially signed Bitcoin transactions into one transaction.\n"
+                "Implements the Combiner role.",
                 {
                     RPCArg{"txs", RPCArg::Type::ARR,
                         {
@@ -1502,8 +1506,6 @@ UniValue combinepsbt(const JSONRPCRequest& request)
                         false},
                 }}
                 .ToString() +
-            "\nCombine multiple partially signed Bitcoin transactions into one transaction.\n"
-            "Implements the Combiner role.\n"
             "\nArguments:\n"
             "1. \"txs\"                   (string) A json array of base64 strings of partially signed transactions\n"
             "    [\n"
@@ -1618,6 +1620,8 @@ UniValue createpsbt(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
         throw std::runtime_error(
             RPCHelpMan{"createpsbt",
+                "Creates a transaction in the Partially Signed Transaction format.\n"
+                "Implements the Creator role.",
                 {
                     RPCArg{"inputs", RPCArg::Type::ARR,
                         {
@@ -1648,8 +1652,6 @@ UniValue createpsbt(const JSONRPCRequest& request)
                     RPCArg{"replacable", RPCArg::Type::BOOL, true},
                 }}
                 .ToString() +
-                            "\nCreates a transaction in the Partially Signed Transaction format.\n"
-                            "Implements the Creator role.\n"
                             "\nArguments:\n"
                             "1. \"inputs\"                (array, required) A json array of json objects\n"
                             "     [\n"

@@ -129,6 +129,17 @@ UniValue DescribeAddress(const CTxDestination& dest)
 
 std::string RPCHelpMan::ToString() const
 {
+    std::string ret = ToStringFirstLine();
+
+    if (m_description.empty()) {
+        return ret;
+    }
+
+    return ret + "\n" + m_description + "\n\n";
+}
+
+std::string RPCHelpMan::ToStringFirstLine() const
+{
     std::string ret;
 
     ret += m_name;
@@ -143,7 +154,7 @@ std::string RPCHelpMan::ToString() const
             // If support for positional arguments is deprecated in the future, remove this line
             assert(!is_optional);
         }
-        ret += arg.ToString();
+        ret += arg.ToStringFirstLine();
     }
     if (is_optional) ret += " )";
     ret += "\n";
@@ -151,7 +162,7 @@ std::string RPCHelpMan::ToString() const
     return ret;
 }
 
-std::string RPCArg::ToStringObj() const
+std::string RPCArg::ToStringObjFirstLine() const
 {
     std::string res = "\"" + m_name + "\"";
     switch (m_type) {
@@ -168,7 +179,7 @@ std::string RPCArg::ToStringObj() const
     case Type::ARR:
         res += ":[";
         for (const auto& i : m_inner) {
-            res += i.ToString() + ",";
+            res += i.ToStringFirstLine() + ",";
         }
         return res + "...]";
     case Type::OBJ:
@@ -180,7 +191,7 @@ std::string RPCArg::ToStringObj() const
     assert(false);
 }
 
-std::string RPCArg::ToString() const
+std::string RPCArg::ToStringFirstLine() const
 {
     switch (m_type) {
     case Type::STR_HEX:
@@ -195,7 +206,7 @@ std::string RPCArg::ToString() const
     case Type::OBJ: {
         std::string res;
         for (size_t i = 0; i < m_inner.size();) {
-            res += m_inner[i].ToStringObj();
+            res += m_inner[i].ToStringObjFirstLine();
             if (++i < m_inner.size()) res += ",";
         }
         return "{" + res + "}";
@@ -203,7 +214,7 @@ std::string RPCArg::ToString() const
     case Type::ARR: {
         std::string res;
         for (const auto& i : m_inner) {
-            res += i.ToString() + ",";
+            res += i.ToStringFirstLine() + ",";
         }
         return "[" + res + "...]";
     }
