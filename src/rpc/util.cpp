@@ -9,6 +9,8 @@
 #include <tinyformat.h>
 #include <utilstrencodings.h>
 
+#define FIRSTLINE_MAX_ARG_LENGTH 100
+
 // Converts a hex string to a public key if possible
 CPubKey HexToPubKey(const std::string& hex_in)
 {
@@ -154,7 +156,7 @@ std::string RPCHelpMan::ToStringFirstLine() const
             // If support for positional arguments is deprecated in the future, remove this line
             assert(!is_optional);
         }
-        ret += arg.ToStringFirstLine();
+        ret += arg.ToStringFirstLine(true);
     }
     if (is_optional) ret += " )";
     ret += "\n";
@@ -179,7 +181,7 @@ std::string RPCArg::ToStringObjFirstLine() const
     case Type::ARR:
         res += ":[";
         for (const auto& i : m_inner) {
-            res += i.ToStringFirstLine() + ",";
+            res += i.ToStringFirstLine(false) + ",";
         }
         return res + "...]";
     case Type::OBJ:
@@ -191,7 +193,7 @@ std::string RPCArg::ToStringObjFirstLine() const
     assert(false);
 }
 
-std::string RPCArg::ToStringFirstLine() const
+std::string RPCArg::ToStringFirstLine(bool shortenIfLong) const
 {
     switch (m_type) {
     case Type::STR_HEX:
@@ -209,14 +211,27 @@ std::string RPCArg::ToStringFirstLine() const
             res += m_inner[i].ToStringObjFirstLine();
             if (++i < m_inner.size()) res += ",";
         }
-        return "{" + res + "}";
+        res = "{" + res + "}";
+        if (shortenIfLong) {
+            if (res.length() > FIRSTLINE_MAX_ARG_LENGTH) {
+                return m_name;
+            }
+        }
+        return res;
     }
     case Type::ARR: {
         std::string res;
         for (const auto& i : m_inner) {
-            res += i.ToStringFirstLine() + ",";
+            res += i.ToStringFirstLine(false) + ",";
         }
-        return "[" + res + "...]";
+        res = "[" + res + "...]";
+
+        if (shortenIfLong) {
+            if (res.length() > FIRSTLINE_MAX_ARG_LENGTH) {
+                return m_name;
+            }
+        }
+        return res;
     }
 
         // no default case, so the compiler can warn about missing cases

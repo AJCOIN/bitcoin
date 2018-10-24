@@ -51,7 +51,7 @@ struct RPCArg {
         assert(type == Type::ARR || type == Type::OBJ);
     }
 
-    std::string ToStringFirstLine() const;
+    std::string ToStringFirstLine(bool shortenIfLong) const;
 
 private:
     std::string ToStringObjFirstLine() const;
